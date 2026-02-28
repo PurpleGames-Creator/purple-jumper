@@ -1,0 +1,1038 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>🟣Purple Jumper🟣</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      display: flex; align-items: center; justify-content: center;
+      min-height: 100vh;
+      background: #0f172a;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: #fff;
+      touch-action: manipulation;
+      -webkit-text-size-adjust: 100%;
+      overscroll-behavior: none;
+    }
+    .game-wrapper {
+      position: relative; display: flex; flex-direction: column;
+      align-items: stretch; gap: 8px;
+      touch-action: manipulation;
+      overscroll-behavior: none;
+    }
+    .header {
+      display: flex; align-items: center; justify-content: space-between;
+      width: 100%; max-width: 420px; margin-bottom: 4px; gap: 8px;
+    }
+    .header-left, .header-right { flex: 0 0 auto; display: flex; align-items: center; }
+    .header-center { flex: 1 1 auto; display: flex; flex-direction: column; align-items: center; gap: 4px; }
+    h1 { font-size: 20px; letter-spacing: 0.08em; text-align: center; }
+    .info { font-size: 12px; color: #c0c0ff; text-align: center; line-height: 1.5; }
+    .canvas-wrap { position: relative; display: inline-block; align-self: center; }
+    canvas {
+      background: transparent; border-radius: 16px;
+      border: 2px solid rgba(255, 255, 255, 0.18);
+      box-shadow: 0 18px 40px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(255, 255, 255, 0.08);
+      touch-action: none;
+    }
+    #mobile-controls { display: none; }
+    .game-wrapper.game-playing #mobile-controls {
+      display: block;
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      top: 0;
+      pointer-events: none;
+    }
+    .game-wrapper.game-playing #mobile-controls .mobile-control-btn {
+      position: absolute;
+      bottom: 30px;
+      width: 80px;
+      height: 80px;
+      padding: 0;
+      font-size: 40px;
+      line-height: 1;
+      border: none;
+      border-radius: 50%;
+      background: rgba(0, 0, 0, 0.4);
+      color: #fff;
+      cursor: pointer;
+      pointer-events: auto;
+      user-select: none;
+      -webkit-user-select: none;
+      -webkit-touch-callout: none;
+      touch-action: manipulation;
+    }
+    .game-wrapper.game-playing #mobile-controls .mobile-control-btn:active { opacity: 0.8; }
+    #mobile-controls #btn-mobile-left { left: 30px; }
+    #mobile-controls #btn-mobile-right { right: 30px; }
+    .hud { display: flex; justify-content: center; gap: 16px; font-size: 14px; }
+    .hud span.label { color: #a0b0ff; margin-right: 4px; }
+    .controls { display: flex; justify-content: center; gap: 16px; margin-top: 8px; }
+    .ctrl-btn {
+      min-width: 80px; padding: 8px 12px; border-radius: 999px;
+      border: 1px solid rgba(255, 255, 255, 0.4);
+      background: radial-gradient(circle at top, rgba(148, 163, 255, 0.25), rgba(15, 23, 42, 0.9));
+      color: #e5e7eb; font-size: 14px; cursor: pointer; user-select: none;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+    }
+    .ctrl-btn:active { transform: translateY(1px) scale(0.98); box-shadow: 0 1px 4px rgba(0, 0, 0, 0.6); }
+    .ctrl-btn span { font-weight: 600; letter-spacing: 0.05em; }
+    .retry-btn {
+      padding: 6px 14px; border-radius: 999px; border: 2px solid rgba(248, 250, 252, 0.95);
+      background: linear-gradient(135deg, #a855f7, #7c3aed); color: #ffffff;
+      font-size: 13px; font-weight: 700; letter-spacing: 0.08em; cursor: pointer;
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(15, 23, 42, 0.7);
+    }
+    .retry-btn:active { transform: translateY(1px) scale(0.97); }
+    .overlay {
+      position: absolute; inset: 0; display: none; align-items: center; justify-content: center;
+      background: rgba(15, 23, 42, 0.88); flex-direction: column; gap: 12px; z-index: 10;
+    }
+    .start-screen { display: flex; }
+    .start-card {
+      padding: 24px 20px; border-radius: 18px;
+      background: radial-gradient(circle at top, #1f2937, #020617);
+      box-shadow: 0 18px 40px rgba(0, 0, 0, 0.85);
+      border: 1px solid rgba(148, 163, 255, 0.4); min-width: 260px; text-align: center;
+    }
+    .start-title {
+      font-size: 22px; font-weight: 700; letter-spacing: 0.12em; margin-bottom: 10px;
+      color: #e5e7ff; text-shadow: 0 0 12px rgba(129, 140, 248, 0.85);
+    }
+    .start-label { font-size: 12px; color: #cbd5f5; margin-bottom: 6px; }
+    .start-input {
+      width: 100%; padding: 6px 10px; border-radius: 999px;
+      border: 1px solid rgba(148, 163, 255, 0.8); background: rgba(15, 23, 42, 0.9);
+      color: #e5e7eb; font-size: 13px; margin-bottom: 12px; outline: none;
+    }
+    .start-input:focus { box-shadow: 0 0 0 1px rgba(196, 181, 253, 0.9); }
+    .primary-btn {
+      padding: 8px 18px; border-radius: 999px; border: 2px solid rgba(248, 250, 252, 0.95);
+      background: linear-gradient(135deg, #8b5cf6, #4c1d95); color: #ffffff;
+      font-size: 13px; font-weight: 700; letter-spacing: 0.08em; cursor: pointer;
+    }
+    .primary-btn:active { transform: translateY(1px) scale(0.97); }
+    #btn-start:disabled {
+      background: #4b5563; color: #9ca3af; cursor: not-allowed; border-color: #6b7280;
+    }
+    #btn-start:disabled:hover, #btn-start:disabled:active { transform: none; }
+    .title-best { font-size: 13px; margin-bottom: 10px; color: #fbbf24; text-shadow: 0 0 10px rgba(250, 204, 21, 0.8); }
+    .title-character { width: 120px; height: 120px; margin: 0 auto 10px; display: flex; align-items: center; justify-content: center; }
+    .title-character img { max-width: 100%; max-height: 100%; image-rendering: pixelated; }
+    .game-over { composes: overlay; }
+    .game-over-message { font-size: 16px; font-weight: 600; letter-spacing: 0.06em; margin-bottom: 4px; }
+    .game-over-sub { font-size: 12px; color: #cbd5f5; margin-bottom: 4px; }
+    .result-scores { font-size: 13px; margin-top: 4px; margin-bottom: 8px; text-align: center; }
+    .result-scores span.label { color: #9ca3af; margin-right: 4px; }
+    .ranking { margin-top: 6px; font-size: 12px; text-align: left; max-height: 300px; overflow-y: auto; overflow-x: hidden; padding-right: 4px; }
+    .ranking-title { font-weight: 600; margin-bottom: 4px; }
+    .ranking-list { list-style: decimal; padding-left: 18px; margin-bottom: 12px; padding-bottom: 12px; }
+    .ranking-list li { margin-bottom: 2px; color: #e5e7eb; }
+    .top-ranking {
+      margin-top: 12px; text-align: left;
+      height: 300px; min-height: 300px; max-height: 300px;
+      display: flex; flex-direction: column; overflow: hidden;
+      padding-right: 8px;
+      scrollbar-width: thin; scrollbar-color: rgba(148, 163, 255, 0.5) rgba(15, 23, 42, 0.8);
+    }
+    .top-ranking-title {
+      font-weight: 600; margin-bottom: 6px; font-size: 15px; color: #cbd5f5;
+      flex-shrink: 0; min-height: 26px; line-height: 26px; box-sizing: border-box;
+    }
+    .top-ranking-list {
+      list-style: none; padding-left: 0; margin: 0;
+      flex: 1; min-height: 0; overflow-y: auto; overflow-x: hidden;
+      margin-bottom: 12px; padding-bottom: 12px;
+    }
+    .top-ranking-list::-webkit-scrollbar { width: 8px; }
+    .top-ranking-list::-webkit-scrollbar-track { background: rgba(15, 23, 42, 0.8); border-radius: 4px; }
+    .top-ranking-list::-webkit-scrollbar-thumb { background: rgba(148, 163, 255, 0.5); border-radius: 4px; }
+    .top-ranking-list::-webkit-scrollbar-thumb:hover { background: rgba(148, 163, 255, 0.7); }
+    .top-ranking-list li { margin-bottom: 4px; color: #e5e7eb; }
+    .top-ranking-list li.rank-1 { font-size: 20px; font-weight: bold; }
+    .top-ranking-list li.rank-2 { font-size: 18px; font-weight: bold; }
+    .top-ranking-list li.rank-3 { font-size: 16px; font-weight: bold; }
+    .top-ranking-list li.rank-4plus { font-size: 13px; }
+    .new-record-badge {
+      display: none; /* 初期状態は非表示 */
+      font-size: 20px;
+      font-weight: 800;
+      font-style: italic;
+      color: #ffffff;
+      text-align: center;
+      margin-bottom: 12px;
+      text-shadow: 
+        0 0 4px #fff, 
+        0 0 10px #fff, 
+        0 0 20px #a855f7, 
+        0 0 40px #a855f7, 
+        0 0 80px #7c3aed;
+      animation: neon-pulse 1.5s infinite alternate;
+    }
+    @keyframes neon-pulse {
+      from { opacity: 0.8; text-shadow: 0 0 4px #fff, 0 0 10px #fff, 0 0 20px #a855f7, 0 0 40px #a855f7; }
+      to { opacity: 1; text-shadow: 0 0 6px #fff, 0 0 12px #fff, 0 0 24px #a855f7, 0 0 48px #a855f7, 0 0 90px #7c3aed; }
+    }
+  </style>
+</head>
+<body>
+  <div class="game-wrapper">
+    <div id="start-screen" class="overlay start-screen">
+      <div class="start-card">
+        <div class="start-title">🟣Purple Jumper🟣</div>
+        <div class="title-best">ベスト <span id="title-best">0</span> 段</div>
+        <div class="title-character"><img src="透過済.png" alt="紫おじさん" /></div>
+        <div class="start-label">ニックネームを入力してください</div>
+        <input id="nickname-input" class="start-input" type="text" maxlength="12" placeholder="例: むらさき太郎" />
+        <button id="btn-start" class="primary-btn">ゲームスタート</button>
+        <div id="top-ranking" class="top-ranking">
+          <div class="top-ranking-title">
+            <span id="rank-prev" style="cursor:pointer; padding:0 8px; font-size: 20px;">◀</span>
+            <span id="rank-title-text" style="width: 140px; font-size: 15px;">今日のランキング</span>
+            <span id="rank-next" style="cursor:pointer; padding:0 8px; font-size: 20px;">▶</span>
+          </div>
+          <ol id="top-ranking-list" class="top-ranking-list"></ol>
+        </div>
+      </div>
+    </div>
+
+    <div class="header">
+      <div class="header-left">
+        <button id="btn-top" class="retry-btn top-btn">トップへ戻る</button>
+      </div>
+      <div class="header-center">
+        <h1>🟣Purple Jumper🟣</h1>
+        <div class="hud">
+          <div><span class="label">段</span><span id="height">0</span> 段</div>
+          <div><span class="label">ベスト</span><span id="best">0</span> 段</div>
+        </div>
+      </div>
+      <div class="header-right">
+        <button id="btn-retry" class="retry-btn">再挑戦</button>
+      </div>
+    </div>
+    
+    <div class="canvas-wrap">
+      <canvas id="game" width="360" height="600"></canvas>
+      <div id="mobile-controls" class="mobile-controls" aria-hidden="true">
+        <button type="button" id="btn-mobile-left" class="mobile-control-btn">◀</button>
+        <button type="button" id="btn-mobile-right" class="mobile-control-btn">▶</button>
+      </div>
+    </div>
+    
+    <div id="game-over" class="overlay game-over">
+      <div class="start-card">
+        <div class="game-over-message">ゲームオーバー</div>
+        <div class="game-over-sub" id="result-nickname"></div>
+        <div id="new-record-badge" class="new-record-badge">✨ New Record! ✨</div>
+        <div class="result-scores">
+          <div><span class="label">今回の記録</span><span id="result-current">0</span> 段</div>
+          <div><span class="label">自己ベスト</span><span id="result-best">0</span> 段</div>
+        </div>
+        <div style="display:flex; justify-content:center; gap:8px; margin-top:8px;">
+          <button id="btn-gameover-retry" class="retry-btn">再挑戦</button>
+          <button id="btn-result-top" class="retry-btn top-btn">トップへ戻る</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      document.addEventListener("touchmove", function (event) {
+        if (event.touches && event.touches.length >= 2) event.preventDefault();
+        if (event.scale !== undefined && event.scale !== 1) event.preventDefault();
+      }, { passive: false });
+      const SUPABASE_URL = "https://hefayilffszrczxhnpii.supabase.co";
+      const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhlZmF5aWxmZnN6cmN6eGhucGlpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE5NDI5NDEsImV4cCI6MjA4NzUxODk0MX0.qUsuQOIZzdlFLXtR-i1d9TX5c3P9QKPdhv34QGt4V_k";
+      let supabaseClient = null;
+      function getSupabaseClient() {
+        if (!supabaseClient && window.supabase && SUPABASE_URL && SUPABASE_ANON_KEY) {
+          supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        }
+        return supabaseClient;
+      }
+      const canvas = document.getElementById("game");
+      const ctx = canvas.getContext("2d");
+      const width = canvas.width;
+      const height = canvas.height;
+
+      const gravity = 0.35;
+      const jumpVelocity = -9;
+
+      let audioCtx = null;
+      function getAudioCtx() {
+        if (!audioCtx) {
+          const AC = window.AudioContext || window.webkitAudioContext;
+          if (AC) audioCtx = new AC();
+        }
+        return audioCtx;
+      }
+
+      function playJumpSound() {
+        const ctxA = getAudioCtx();
+        if (!ctxA) return;
+        const osc = ctxA.createOscillator();
+        const gain = ctxA.createGain();
+        osc.type = "triangle";
+        const now = ctxA.currentTime;
+        osc.frequency.setValueAtTime(260, now);
+        osc.frequency.exponentialRampToValueAtTime(780, now + 0.25);
+        gain.gain.setValueAtTime(0.0, now);
+        gain.gain.linearRampToValueAtTime(0.35, now + 0.03);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.35);
+        osc.connect(gain).connect(ctxA.destination);
+        osc.start(now);
+        osc.stop(now + 0.4);
+      }
+
+      function playLandSound() {
+        const ctxA = getAudioCtx();
+        if (!ctxA) return;
+        const osc = ctxA.createOscillator();
+        const gain = ctxA.createGain();
+        osc.type = "sine";
+        const now = ctxA.currentTime;
+        osc.frequency.setValueAtTime(150, now);
+        osc.frequency.exponentialRampToValueAtTime(70, now + 0.12);
+        gain.gain.setValueAtTime(0.0, now);
+        gain.gain.linearRampToValueAtTime(0.6, now + 0.02);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.25);
+        osc.connect(gain).connect(ctxA.destination);
+        osc.start(now);
+        osc.stop(now + 0.3);
+      }
+
+      function playIceCrackSound() {
+        const ctxA = getAudioCtx();
+        if (!ctxA) return;
+        const osc = ctxA.createOscillator();
+        const gain = ctxA.createGain();
+        osc.type = "sine";
+        const now = ctxA.currentTime;
+        osc.frequency.setValueAtTime(2600, now);
+        gain.gain.setValueAtTime(0.0, now);
+        gain.gain.linearRampToValueAtTime(0.35, now + 0.002);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.012);
+        osc.connect(gain).connect(ctxA.destination);
+        osc.start(now);
+        osc.stop(now + 0.015);
+      }
+
+      function playIceBreakSound() {
+        const ctxA = getAudioCtx();
+        if (!ctxA) return;
+        const now = ctxA.currentTime;
+        const freqs = [2000, 2700, 3500, 2400, 3100];
+        const oscs = freqs.map(function (f) {
+          const o = ctxA.createOscillator();
+          o.type = "sine";
+          o.frequency.setValueAtTime(f, now);
+          o.frequency.exponentialRampToValueAtTime(f * 0.4, now + 0.25);
+          return o;
+        });
+        const gainOsc = ctxA.createGain();
+        gainOsc.gain.setValueAtTime(0.0, now);
+        gainOsc.gain.linearRampToValueAtTime(0.28, now + 0.008);
+        gainOsc.gain.exponentialRampToValueAtTime(0.001, now + 0.32);
+        oscs.forEach(function (o) {
+          o.connect(gainOsc);
+          o.start(now);
+          o.stop(now + 0.35);
+        });
+        gainOsc.connect(ctxA.destination);
+        const bufferSize = ctxA.sampleRate * 0.35;
+        const buffer = ctxA.createBuffer(1, bufferSize, ctxA.sampleRate);
+        const data = buffer.getChannelData(0);
+        for (let i = 0; i < bufferSize; i++) data[i] = (Math.random() * 2 - 1) * 0.4;
+        const noise = ctxA.createBufferSource();
+        noise.buffer = buffer;
+        const gainNoise = ctxA.createGain();
+        gainNoise.gain.setValueAtTime(0.0, now);
+        gainNoise.gain.linearRampToValueAtTime(0.2, now + 0.01);
+        gainNoise.gain.exponentialRampToValueAtTime(0.001, now + 0.28);
+        noise.connect(gainNoise).connect(ctxA.destination);
+        noise.start(now);
+        noise.stop(now + 0.35);
+      }
+
+      const player = { x: width / 2, y: height - 80, width: 40, height: 80, vy: 0, onGround: false };
+      
+      const platforms = [];
+      let particles = [];
+      
+      const PLATFORM_COUNT = 12;
+      const MAX_JUMP_HEIGHT = (jumpVelocity * jumpVelocity) / (2 * gravity);
+      const FIRST_GAP = MAX_JUMP_HEIGHT * 0.55;
+      const Y_GAP_MARGIN = 50;
+      const MAX_Y_GAP = Math.max(40, MAX_JUMP_HEIGHT - Y_GAP_MARGIN);
+      const PLATFORM_GAP = Math.min(MAX_JUMP_HEIGHT * 0.6, MAX_Y_GAP);
+      const PLATFORM_WIDTH = 70;
+      const PLATFORM_HEIGHT = 12;
+      const RED_JUMP_MULTIPLIER = Math.sqrt(5);
+      const MOVING_PLATFORM_SPEED = 2.0; // 1.3倍にアップ
+
+      const ojisanImg = new Image();
+      ojisanImg.src = "透過済.png";
+      let ojisanLoaded = false;
+      ojisanImg.onload = () => { ojisanLoaded = true; };
+
+      let cameraOffsetY = 0;
+      let currentStep = 0;
+      let minPlayerY = 0; // スコア計算のための最高到達点
+      let startY = 0;     // スタート時のY座標
+
+      let bestStep = 0;
+      let previousBest = 0;
+
+      const heightEl = document.getElementById("height");
+      const bestEl = document.getElementById("best");
+      const resultCurrentEl = document.getElementById("result-current");
+      const resultBestEl = document.getElementById("result-best");
+      const resultNicknameEl = document.getElementById("result-nickname");
+      const titleBestEl = document.getElementById("title-best");
+      const newRecordBadgeEl = document.getElementById("new-record-badge");
+
+      heightEl.textContent = currentStep.toString();
+      bestEl.textContent = "0";
+      if (titleBestEl) titleBestEl.textContent = "0";
+
+      let rankingDataByNickname = {};
+
+      let leftPressed = false, rightPressed = false;
+      let paused = false, gameOver = false, gameStarted = false, playerName = "";
+
+      function resetGame() {
+        player.x = width / 2;
+        player.y = height - 80;
+        player.vy = 0;
+        player.onGround = true;
+        
+        startY = player.y;
+        minPlayerY = player.y;
+        cameraOffsetY = 0;
+        currentStep = 0;
+        heightEl.textContent = "0";
+        resultCurrentEl.textContent = "0";
+        if (newRecordBadgeEl) newRecordBadgeEl.style.display = "none";
+
+        leftPressed = false; rightPressed = false;
+        paused = false; gameOver = false;
+
+        platforms.length = 0;
+        particles.length = 0;
+
+        const bottomY = height - 40;
+        platforms.push({ x: width / 2 - PLATFORM_WIDTH / 2, y: bottomY, width: PLATFORM_WIDTH, height: PLATFORM_HEIGHT, type: 'normal', hp: 1, vx: 0 });
+
+        let currentY = bottomY - FIRST_GAP;
+        platforms.push(createRandomPlatform(currentY));
+
+        // 画面上部の見えない位置まで、十分な数の足場を先読み生成する
+        const bufferHeight = height * 2;
+        while (bottomY - currentY < bufferHeight) {
+          currentY -= PLATFORM_GAP;
+          platforms.push(createRandomPlatform(currentY));
+        }
+      }
+
+      function createRandomPlatform(y) {
+        const r = Math.random();
+        let type = 'normal';
+        let vx = 0;
+        let hp = 1;
+
+        // 50段以上なら20%の確率で氷の足場（耐久2）
+        if (currentStep >= 50 && r < 0.20) {
+          type = 'ice';
+          hp = 2;
+        } else if (r < 0.35) {
+          // 赤い足場 15%
+          type = 'red';
+        } else if (r < 0.95) {
+          // 動く足場 60%：速度バリエーション 0.5 / 1.0 / 1.5 倍（標準多め）、100段超えでさらに1.5倍
+          const rand = Math.random();
+          const mult = rand < 0.25 ? 0.5 : rand < 0.75 ? 1.0 : 1.5;
+          const baseSpeed = MOVING_PLATFORM_SPEED * mult * (currentStep >= 100 ? 1.5 : 1.0);
+          vx = Math.random() < 0.5 ? baseSpeed : -baseSpeed;
+        }
+
+        return { x: Math.random() * (width - PLATFORM_WIDTH), y, width: PLATFORM_WIDTH, height: PLATFORM_HEIGHT, type, hp, vx };
+      }
+
+      function spawnParticles(x, y, color) {
+        for(let i=0; i<15; i++) {
+          particles.push({
+            x: x, y: y,
+            vx: (Math.random()-0.5)*8,
+            vy: (Math.random()-0.5)*8,
+            life: 30 + Math.random()*10,
+            color: color
+          });
+        }
+      }
+
+      function updatePhysics() {
+        if (!gameStarted || paused) return;
+
+        // --- 1. 高度ベースのスコア計算 ---
+        if (player.y < minPlayerY) {
+          minPlayerY = player.y;
+          // 初期位置からどれだけ登ったかをGAPで割って段数を算出
+          let calcStep = Math.floor((startY - minPlayerY) / PLATFORM_GAP);
+          if (calcStep > currentStep) {
+            currentStep = calcStep;
+            heightEl.textContent = currentStep.toString();
+            if (currentStep > bestStep) {
+              bestStep = currentStep;
+              bestEl.textContent = bestStep.toString();
+            }
+          }
+        }
+
+        const moveSpeed = 4;
+        if (leftPressed) player.x -= moveSpeed;
+        if (rightPressed) player.x += moveSpeed;
+
+        // 3. X座標を常に [0, width) に正規化（トーラス状ラップ）
+        player.x = (player.x % width + width) % width;
+
+        const halfW = player.width / 2;
+
+        player.vy += gravity;
+        player.y += player.vy;
+
+        // 動く足場の更新
+        for (const p of platforms) {
+          if (p.vx) {
+            p.x += p.vx;
+            // X座標を常に [0, width) に正規化（トーラス状ラップ）
+            p.x = (p.x % width + width) % width;
+          }
+        }
+
+        player.onGround = false;
+        if (player.vy >= 0) {
+          const tolerance = 6;
+          for (let i = 0; i < platforms.length; i++) {
+            const p = platforms[i];
+            const playerBottom = player.y + player.height / 2;
+            const playerPrevBottom = playerBottom - player.vy;
+            // 1. 画面左右端を跨いだ場合も含めたX方向当たり判定
+            const offsets = [0, -width, width];
+            let withinX = false;
+            for (let k = 0; k < offsets.length; k++) {
+              const px = player.x + offsets[k];
+              if (px + halfW > p.x && px - halfW < p.x + p.width) {
+                withinX = true;
+                break;
+              }
+            }
+            const crossingDown = playerPrevBottom <= p.y + tolerance && playerBottom >= p.y - tolerance;
+            
+            if (withinX && crossingDown) {
+              player.y = p.y - player.height / 2;
+              playLandSound();
+
+              // 氷の足場の処理
+              if (p.type === 'ice') {
+                p.hp -= 1;
+                if (p.hp === 1) {
+                  playIceCrackSound();
+                } else if (p.hp <= 0) {
+                  playIceBreakSound();
+                  spawnParticles(p.x + p.width/2, p.y + p.height/2, '#bae6fd');
+                  platforms.splice(i, 1);
+                }
+              }
+
+              const multiplier = (p.type === 'red') ? RED_JUMP_MULTIPLIER : 1;
+              player.vy = jumpVelocity * multiplier;
+              player.onGround = false;
+              playJumpSound();
+              break;
+            }
+          }
+        }
+
+        const midY = height * 0.5;
+        const screenY = player.y - cameraOffsetY;
+        if (screenY < midY && player.vy < 0) {
+          const overshoot = midY - screenY;
+          const upSpeed = Math.min(overshoot, -player.vy);
+          cameraOffsetY -= upSpeed;
+        }
+
+        // 足場の再生成＆先読みループ
+        for (let i = 0; i < platforms.length; i++) {
+          const p = platforms[i];
+          // 画面のかなり下まで落ちた足場は、列の一番上に再利用する
+          if (p.y - cameraOffsetY > height + 80) {
+            const currentMinY = Math.min(...platforms.map(pl => pl.y));
+            const newPlat = createRandomPlatform(currentMinY - PLATFORM_GAP);
+            platforms[i] = newPlat;
+          }
+        }
+
+        // カメラより上方向に、常に十分な足場が先読み生成されている状態を維持する
+        const bufferHeight = height * 2;
+        let currentMinY = Math.min(...platforms.map(pl => pl.y));
+        while (cameraOffsetY - currentMinY < bufferHeight) {
+          currentMinY -= PLATFORM_GAP;
+          platforms.push(createRandomPlatform(currentMinY));
+        }
+
+        if (!gameOver && player.y - cameraOffsetY > height + 80) {
+          gameOver = true;
+          paused = true;
+          showResultScreen();
+        }
+      }
+
+      let starPositions = [];
+
+      function lerpColor(c1, c2, t) {
+        t = Math.max(0, Math.min(1, t));
+        const r = Math.round(c1.r + (c2.r - c1.r) * t);
+        const g = Math.round(c1.g + (c2.g - c1.g) * t);
+        const b = Math.round(c1.b + (c2.b - c1.b) * t);
+        return "rgb(" + r + "," + g + "," + b + ")";
+      }
+
+      function drawBackground() {
+        const step = currentStep;
+        // 0〜500段を 10段刻みで丸めた進行度（0.0〜1.0）
+        const progress = Math.min(Math.floor(step / 10) * 10 / 500, 1);
+
+        // スタート時の淡い空＋大地の薄緑
+        const startTop = { r: 180, g: 235, b: 220 };  // 少し水色がかった淡い緑
+        const startBottom = { r: 120, g: 220, b: 160 }; // 明るめの薄緑
+        const endColor = { r: 0, g: 0, b: 0 }; // 完全な黒
+
+        const topColor = lerpColor(startTop, endColor, progress);
+        const bottomColor = lerpColor(startBottom, endColor, progress);
+
+        // 背景全体のグラデーション
+        const grad = ctx.createLinearGradient(0, 0, 0, height);
+        grad.addColorStop(0, topColor);
+        grad.addColorStop(1, bottomColor);
+        ctx.fillStyle = grad;
+        ctx.fillRect(0, 0, width, height);
+
+        // 星（宇宙）の演出：300段から500段にかけてフェードイン
+        const starProgress = Math.min(1, Math.max(0, (step - 300) / 200));
+        if (starProgress <= 0) return;
+
+        if (starPositions.length === 0) {
+          for (let i = 0; i < 48; i++) {
+            starPositions.push({
+              x: ((i * 13.7 + 31) % (width + 20)) - 10,
+              y: ((i * 19.3 + 47) % (height + 20)) - 10,
+              r: 0.6 + (i % 4) * 0.35,
+              phase: i * 0.7
+            });
+          }
+        }
+        const twinkle = Date.now() / 400;
+        starPositions.forEach(function (s) {
+          const baseAlpha = starProgress;
+          const alpha = baseAlpha * (0.5 + 0.5 * Math.sin(twinkle + s.phase));
+          ctx.fillStyle = "rgba(255, 255, 255, " + alpha + ")";
+          ctx.beginPath();
+          ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+          ctx.fill();
+        });
+      }
+
+      function drawPlatforms() {
+        function renderPlatform(drawX, drawY, p) {
+          const x = drawX; const w = p.width; const h = p.height;
+          ctx.save();
+          const radius = 6; const baseY = drawY;
+          let baseGradient = ctx.createLinearGradient(x, baseY, x, baseY + h);
+          
+          if (p.type === 'red') {
+            baseGradient.addColorStop(0, "#fecaca"); baseGradient.addColorStop(0.5, "#f87171"); baseGradient.addColorStop(1, "#b91c1c");
+          } else if (p.type === 'ice') {
+            baseGradient.addColorStop(0, "#bae6fd"); baseGradient.addColorStop(0.5, "#7dd3fc"); baseGradient.addColorStop(1, "#38bdf8");
+          } else {
+            baseGradient.addColorStop(0, "#a16207"); baseGradient.addColorStop(0.5, "#92400e"); baseGradient.addColorStop(1, "#713f12");
+          }
+          ctx.fillStyle = baseGradient;
+          ctx.beginPath();
+          ctx.moveTo(x + radius, baseY); ctx.lineTo(x + w - radius, baseY);
+          ctx.quadraticCurveTo(x + w, baseY, x + w, baseY + radius);
+          ctx.lineTo(x + w, baseY + h - radius);
+          ctx.quadraticCurveTo(x + w, baseY + h, x + w - radius, baseY + h);
+          ctx.lineTo(x + radius, baseY + h); ctx.quadraticCurveTo(x, baseY + h, x, baseY + h - radius);
+          ctx.lineTo(x, baseY + radius); ctx.quadraticCurveTo(x, baseY, x + radius, baseY);
+          ctx.fill();
+
+          // 氷のヒビ割れ描画（耐久2なので hp===1 の時のみ）
+          if (p.type === 'ice' && p.hp < 2) {
+            ctx.strokeStyle = "rgba(255, 255, 255, 0.9)";
+            ctx.lineWidth = 1.5;
+            ctx.beginPath();
+            ctx.moveTo(x + w/2, baseY); ctx.lineTo(x + w/2 + 10, baseY + h/2); ctx.lineTo(x + w/2 - 5, baseY + h);
+            ctx.stroke();
+          }
+
+          if (p.type !== 'ice') {
+            ctx.strokeStyle = p.type === 'red' ? "rgba(254, 242, 242, 0.4)" : "rgba(249, 250, 251, 0.3)";
+            ctx.lineWidth = 1;
+            for (let i = 1; i <= 2; i++) {
+              const yy = baseY + (h / 3) * i;
+              ctx.beginPath(); ctx.moveTo(x + 4, yy);
+              ctx.quadraticCurveTo(x + w / 2, yy + (i % 2 === 0 ? 1.5 : -1.5), x + w - 4, yy);
+              ctx.stroke();
+            }
+          }
+
+          ctx.restore();
+        }
+
+        for (const p of platforms) {
+          const y = p.y - cameraOffsetY;
+          if (y < -40 || y > height + 40) continue;
+
+          // 基本の描画
+          renderPlatform(p.x, y, p);
+          // 右にはみ出した分を左側にも描画
+          if (p.x + p.width > width) {
+            renderPlatform(p.x - width, y, p);
+          }
+          // 左にはみ出した分を右側にも描画
+          if (p.x < 0) {
+            renderPlatform(p.x + width, y, p);
+          }
+        }
+      }
+
+      function drawParticles() {
+        ctx.save();
+        for (let i = particles.length - 1; i >= 0; i--) {
+          let p = particles[i];
+          p.x += p.vx; p.y += p.vy; p.life--;
+          if (p.life <= 0) {
+            particles.splice(i, 1);
+            continue;
+          }
+          ctx.globalAlpha = p.life / 40;
+          ctx.fillStyle = p.color;
+          ctx.beginPath();
+          ctx.arc(p.x, p.y - cameraOffsetY, 3, 0, Math.PI*2);
+          ctx.fill();
+        }
+        ctx.restore();
+      }
+
+      function drawPlayer() {
+        const px = player.x;
+        const py = player.y - cameraOffsetY;
+        const feetY = py + player.height / 2;
+
+        function drawSinglePlayerAt(drawX) {
+          ctx.save();
+          ctx.translate(drawX, feetY);
+          let stretchY = 1;
+          let stretchX = 1;
+          if (!player.onGround) {
+            if (player.vy < -2) { stretchY = 1.2; stretchX = 0.92; }
+            else if (player.vy > 3) { stretchY = 0.9; stretchX = 1.05; }
+          }
+          ctx.scale(stretchX, stretchY);
+          if (ojisanLoaded) {
+            const imgW = ojisanImg.width; const imgH = ojisanImg.height;
+            const targetHeight = player.height * 1.5;
+            const aspect = imgW / imgH; const targetWidth = targetHeight * aspect;
+            ctx.drawImage(ojisanImg, -targetWidth / 2, -targetHeight, targetWidth, targetHeight);
+          } else {
+            ctx.fillStyle = "#7c3aed";
+            ctx.fillRect(-player.width / 2, -player.height, player.width, player.height);
+          }
+          ctx.restore();
+        }
+
+        // メインの描画
+        drawSinglePlayerAt(px);
+        // 2. 画面端でのラップアラウンド描画（デュアルレンダリング）
+        const halfW = player.width / 2;
+        if (px < halfW) {
+          drawSinglePlayerAt(px + width);
+        } else if (px > width - halfW) {
+          drawSinglePlayerAt(px - width);
+        }
+      }
+
+      function drawScoreOverlay() {
+        ctx.save();
+        ctx.font = "bold 64px sans-serif";
+        ctx.textAlign = "center";
+        ctx.fillStyle = "rgba(255, 255, 255, 0.2)";
+        ctx.fillText(currentStep + " 段", width / 2, 120);
+        ctx.restore();
+      }
+
+      async function showResultScreen() {
+        const overEl = document.getElementById("game-over");
+        if (overEl) overEl.style.display = "flex";
+        const gw = document.querySelector(".game-wrapper");
+        if (gw) gw.classList.remove("game-playing");
+        const mobileControls = document.getElementById("mobile-controls");
+        if (mobileControls) mobileControls.style.display = "none";
+        resultCurrentEl.textContent = currentStep.toString();
+        resultBestEl.textContent = bestStep.toString();
+        resultNicknameEl.textContent = playerName ? `プレイヤー: ${playerName}` : "プレイヤー: ななしさん";
+        if (newRecordBadgeEl) {
+          if (currentStep > previousBest) {
+            newRecordBadgeEl.style.display = "block";
+          } else {
+            newRecordBadgeEl.style.display = "none";
+          }
+        }
+        const client = getSupabaseClient();
+        if (client) {
+          try {
+            await client.from("scores").insert({
+              nickname: (playerName || "").trim() || "ななしさん",
+              score: currentStep
+            });
+          } catch (_err) { /* 送信失敗時は無視 */ }
+        }
+      }
+
+      function loop() {
+        updatePhysics();
+        ctx.clearRect(0, 0, width, height);
+        drawBackground();
+        drawPlatforms();
+        drawParticles();
+        drawPlayer();
+        drawScoreOverlay();
+        requestAnimationFrame(loop);
+      }
+
+      window.addEventListener("keydown", function (e) {
+        if (e.key === "ArrowLeft" || e.key === "a" || e.key === "A") leftPressed = true;
+        else if (e.key === "ArrowRight" || e.key === "d" || e.key === "D") rightPressed = true;
+        else if (e.key === "t" || e.key === "T") goToTop();
+        else if (e.key === "r" || e.key === "R") {
+          if (gameOver && gameOverEl) {
+            previousBest = bestStep;
+            resetGame();
+            gameOverEl.style.display = "none";
+          }
+        }
+      });
+      window.addEventListener("keyup", function (e) {
+        if (e.key === "ArrowLeft" || e.key === "a" || e.key === "A") leftPressed = false;
+        else if (e.key === "ArrowRight" || e.key === "d" || e.key === "D") rightPressed = false;
+      });
+
+      const btnLeft = document.getElementById("btn-left");
+      const btnRight = document.getElementById("btn-right");
+      const btnMobileLeft = document.getElementById("btn-mobile-left");
+      const btnMobileRight = document.getElementById("btn-mobile-right");
+      const btnRetry = document.getElementById("btn-retry");
+      const btnTop = document.getElementById("btn-top");
+      const mobileControlsEl = document.getElementById("mobile-controls");
+      const gameOverEl = document.getElementById("game-over");
+      const btnGameOverRetry = document.getElementById("btn-gameover-retry");
+      const btnResultTop = document.getElementById("btn-result-top");
+      const startScreenEl = document.getElementById("start-screen");
+      const btnStart = document.getElementById("btn-start");
+      const nicknameInput = document.getElementById("nickname-input");
+      const topRankingListEl = document.getElementById("top-ranking-list");
+      const rankTitleTextEl = document.getElementById("rank-title-text");
+      const rankPrevEl = document.getElementById("rank-prev");
+      const rankNextEl = document.getElementById("rank-next");
+      const rankingModes = [
+        { id: "daily", name: "今日のランキング" },
+        { id: "weekly", name: "週間ランキング" },
+        { id: "all", name: "歴代ランキング" }
+      ];
+      let currentRankingModeIndex = 0;
+
+      function updateBestScoreDisplay() {
+        const nick = (nicknameInput && nicknameInput.value ? nicknameInput.value : "").trim();
+        const score = nick && rankingDataByNickname[nick] ? Number(rankingDataByNickname[nick].score) : 0;
+        if (titleBestEl) titleBestEl.textContent = score.toString();
+        bestStep = score;
+        if (bestEl) bestEl.textContent = score.toString();
+      }
+
+      function getRankingDateFrom() {
+        const mode = rankingModes[currentRankingModeIndex];
+        if (mode.id === "all") return null;
+        const now = new Date();
+        if (mode.id === "daily") {
+          const today = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0, 0);
+          return today.toISOString();
+        }
+        if (mode.id === "weekly") {
+          const d = new Date(now);
+          const day = d.getDay();
+          const diff = day === 0 ? -6 : 1 - day;
+          d.setDate(d.getDate() + diff);
+          d.setHours(0, 0, 0, 0);
+          return d.toISOString();
+        }
+        return null;
+      }
+
+      async function loadTopRanking() {
+        if (!topRankingListEl) return;
+        if (rankTitleTextEl) rankTitleTextEl.textContent = rankingModes[currentRankingModeIndex].name;
+        topRankingListEl.innerHTML = "";
+        const client = getSupabaseClient();
+        if (!client) {
+          topRankingListEl.appendChild(createRankingLi("rank-4plus", "ランキングを読み込めません"));
+          rankingDataByNickname = {};
+          updateBestScoreDisplay();
+          return;
+        }
+        try {
+          const dateFrom = getRankingDateFrom();
+          /* 取得上限: 3000件（データ途切れ防止のため十分な数） */
+          let query = client.from("scores").select("nickname, score" + (dateFrom ? ", created_at" : "")).order("score", { ascending: false }).limit(3000);
+          if (dateFrom) query = query.gte("created_at", dateFrom);
+          const { data, error } = await query;
+          if (error) {
+            topRankingListEl.appendChild(createRankingLi("rank-4plus", "取得できませんでした"));
+            rankingDataByNickname = {};
+            updateBestScoreDisplay();
+            return;
+          }
+          const rows = data || [];
+          const byName = {};
+          rows.forEach(function (row) {
+            const n = (row.nickname || "").trim() || "ななし";
+            if (!(n in byName) || byName[n].score < row.score) byName[n] = { nickname: n, score: Number(row.score) };
+          });
+          rankingDataByNickname = byName;
+          const unique = Object.keys(byName).map(function (k) { return byName[k]; });
+          unique.sort(function (a, b) { return b.score - a.score; });
+          console.log("現在の期間のユニークプレイヤー数:", unique.length);
+          const top100 = unique.slice(0, 100);
+          if (top100.length === 0) {
+            topRankingListEl.appendChild(createRankingLi("rank-4plus", "まだ記録がありません"));
+            updateBestScoreDisplay();
+            return;
+          }
+          top100.forEach(function (row, i) {
+            const prevScore = i > 0 ? top100[i - 1].score : null;
+            const displayRank = (i > 0 && row.score === prevScore) ? top100[i - 1]._displayRank : (i + 1);
+            row._displayRank = displayRank;
+            const medal = displayRank === 1 ? "🥇" : displayRank === 2 ? "🥈" : displayRank === 3 ? "🥉" : "";
+            const cls = displayRank === 1 ? "rank-1" : displayRank === 2 ? "rank-2" : displayRank === 3 ? "rank-3" : "rank-4plus";
+            const rankText = displayRank + "位 ";
+            const text = medal ? medal + " " + rankText + row.nickname + " … " + row.score + " 段" : rankText + row.nickname + " … " + row.score + " 段";
+            topRankingListEl.appendChild(createRankingLi(cls, text));
+          });
+          updateBestScoreDisplay();
+        } catch (err) {
+          topRankingListEl.appendChild(createRankingLi("rank-4plus", "読み込みに失敗しました"));
+          updateBestScoreDisplay();
+        }
+      }
+
+      function createRankingLi(className, text) {
+        const li = document.createElement("li");
+        li.className = className;
+        li.textContent = text;
+        return li;
+      }
+
+      if (rankPrevEl) {
+        rankPrevEl.addEventListener("click", function () {
+          currentRankingModeIndex = (currentRankingModeIndex - 1 + rankingModes.length) % rankingModes.length;
+          if (rankTitleTextEl) rankTitleTextEl.textContent = rankingModes[currentRankingModeIndex].name;
+          loadTopRanking();
+        });
+      }
+      if (rankNextEl) {
+        rankNextEl.addEventListener("click", function () {
+          currentRankingModeIndex = (currentRankingModeIndex + 1) % rankingModes.length;
+          if (rankTitleTextEl) rankTitleTextEl.textContent = rankingModes[currentRankingModeIndex].name;
+          loadTopRanking();
+        });
+      }
+
+      function bindButtonHold(btn, onDown, onUp) {
+        btn.addEventListener("mousedown", function(e) { e.preventDefault(); e.stopPropagation(); onDown(); });
+        btn.addEventListener("mouseup", onUp); btn.addEventListener("mouseleave", onUp);
+        btn.addEventListener("touchstart", function(e) { e.preventDefault(); e.stopPropagation(); onDown(); }, { passive: false });
+        btn.addEventListener("touchend", onUp); btn.addEventListener("touchcancel", onUp);
+      }
+      if (btnLeft) bindButtonHold(btnLeft, () => leftPressed = true, () => leftPressed = false);
+      if (btnRight) bindButtonHold(btnRight, () => rightPressed = true, () => rightPressed = false);
+      if (btnMobileLeft) bindButtonHold(btnMobileLeft, () => leftPressed = true, () => leftPressed = false);
+      if (btnMobileRight) bindButtonHold(btnMobileRight, () => rightPressed = true, () => rightPressed = false);
+      btnRetry.addEventListener("click", function () {
+        previousBest = bestStep;
+        resetGame();
+        if (gameOverEl) gameOverEl.style.display = "none";
+        const gw = document.querySelector(".game-wrapper");
+        if (gw) gw.classList.add("game-playing");
+        if (mobileControlsEl) mobileControlsEl.style.display = "block";
+      });
+      btnGameOverRetry.addEventListener("click", function () {
+        previousBest = bestStep;
+        resetGame();
+        if (gameOverEl) gameOverEl.style.display = "none";
+        const gw = document.querySelector(".game-wrapper");
+        if (gw) gw.classList.add("game-playing");
+        if (mobileControlsEl) mobileControlsEl.style.display = "block";
+      });
+      async function goToTop() {
+        gameStarted = false; paused = false; resetGame();
+        if (gameOverEl) gameOverEl.style.display = "none";
+        if (startScreenEl) startScreenEl.style.display = "flex";
+        const gw = document.querySelector(".game-wrapper");
+        if (gw) gw.classList.remove("game-playing");
+        if (mobileControlsEl) mobileControlsEl.style.display = "none";
+        await loadTopRanking();
+      }
+      btnTop.addEventListener("click", function () { goToTop(); });
+      btnResultTop.addEventListener("click", function () { goToTop(); });
+      btnStart.addEventListener("click", function () {
+        if (btnStart.disabled) return;
+        playerName = nicknameInput.value.trim() || "ななしさん";
+        localStorage.setItem("murasaki_ojisan_player_name", playerName);
+        previousBest = bestStep;
+        gameStarted = true; paused = false;
+        if (startScreenEl) startScreenEl.style.display = "none";
+        const gw = document.querySelector(".game-wrapper");
+        if (gw) gw.classList.add("game-playing");
+        if (mobileControlsEl) mobileControlsEl.style.display = "block";
+        resetGame();
+      });
+
+      function updateStartButtonState() {
+        const v = (nicknameInput && nicknameInput.value ? nicknameInput.value : "").trim();
+        btnStart.disabled = v.length === 0;
+      }
+      if (nicknameInput) {
+        nicknameInput.addEventListener("input", function () {
+          updateStartButtonState();
+          updateBestScoreDisplay();
+        });
+      }
+      updateStartButtonState();
+
+      const savedName = localStorage.getItem("murasaki_ojisan_player_name");
+      if (savedName) { playerName = savedName; if (nicknameInput) nicknameInput.value = savedName; updateStartButtonState(); }
+      if (startScreenEl) startScreenEl.style.display = "flex";
+      if (mobileControlsEl) mobileControlsEl.style.display = "none";
+      resetGame();
+      loadTopRanking();
+      loop();
+    })();
+  </script>
+</body>
+</html>
