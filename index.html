@@ -7,6 +7,13 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
+    html {
+      -webkit-text-size-adjust: 100%;
+      -webkit-tap-highlight-color: transparent;
+      -webkit-touch-callout: none;
+      user-select: none;
+      -webkit-user-select: none;
+    }
     body {
       display: flex; align-items: center; justify-content: center;
       min-height: 100vh;
@@ -16,6 +23,10 @@
       touch-action: manipulation;
       -webkit-text-size-adjust: 100%;
       overscroll-behavior: none;
+      -webkit-tap-highlight-color: transparent;
+      -webkit-touch-callout: none;
+      user-select: none;
+      -webkit-user-select: none;
     }
     .game-wrapper {
       position: relative; display: flex; flex-direction: column;
@@ -70,6 +81,8 @@
       width: 100%; padding: 6px 10px; border-radius: 999px;
       border: 1px solid rgba(148, 163, 255, 0.8); background: rgba(15, 23, 42, 0.9);
       color: #e5e7eb; font-size: 13px; margin-bottom: 12px; outline: none;
+      -webkit-user-select: text;
+      user-select: text;
     }
     .start-input:focus { box-shadow: 0 0 0 1px rgba(196, 181, 253, 0.9); }
     .primary-btn {
@@ -987,6 +1000,10 @@
         rightPressed = false;
       }
 
+      function isGamePlayTouchTarget(el) {
+        return !!(el && el.closest && el.closest("button, input, textarea, select, a[href], label, [contenteditable='true']"));
+      }
+
       window.addEventListener("mousedown", function (e) {
         handlePointerDown(e.clientX);
       });
@@ -995,10 +1012,17 @@
       });
       window.addEventListener("touchstart", function (e) {
         if (!e.touches || e.touches.length === 0) return;
+        const gw = document.querySelector(".game-wrapper");
+        if (gw && gw.classList.contains("game-playing") && !isGamePlayTouchTarget(e.target)) {
+          e.preventDefault();
+        }
         const touch = e.touches[0];
         handlePointerDown(touch.clientX);
-      }, { passive: true });
+      }, { passive: false });
       window.addEventListener("touchend", function () {
+        handlePointerUp();
+      });
+      window.addEventListener("touchcancel", function () {
         handlePointerUp();
       });
 
