@@ -23,13 +23,6 @@
       touch-action: manipulation;
       overscroll-behavior: none;
     }
-    .header {
-      display: flex; align-items: center; justify-content: space-between;
-      width: 100%; max-width: 420px; margin-bottom: 4px; gap: 8px;
-    }
-    .header-left, .header-right { flex: 0 0 auto; display: flex; align-items: center; }
-    .header-center { flex: 1 1 auto; display: flex; flex-direction: column; align-items: center; gap: 4px; }
-    h1 { font-size: 20px; letter-spacing: 0.08em; text-align: center; }
     .info { font-size: 12px; color: #c0c0ff; text-align: center; line-height: 1.5; }
     .canvas-wrap { position: relative; display: inline-block; align-self: center; }
     canvas {
@@ -39,39 +32,7 @@
       touch-action: none;
     }
     #mobile-controls { display: none; }
-    .game-wrapper.game-playing #mobile-controls {
-      display: block;
-      position: absolute;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      top: 0;
-      pointer-events: none;
-    }
-    .game-wrapper.game-playing #mobile-controls .mobile-control-btn {
-      position: absolute;
-      bottom: 30px;
-      width: 80px;
-      height: 80px;
-      padding: 0;
-      font-size: 40px;
-      line-height: 1;
-      border: none;
-      border-radius: 50%;
-      background: rgba(0, 0, 0, 0.4);
-      color: #fff;
-      cursor: pointer;
-      pointer-events: auto;
-      user-select: none;
-      -webkit-user-select: none;
-      -webkit-touch-callout: none;
-      touch-action: manipulation;
-    }
-    .game-wrapper.game-playing #mobile-controls .mobile-control-btn:active { opacity: 0.8; }
-    #mobile-controls #btn-mobile-left { left: 30px; }
-    #mobile-controls #btn-mobile-right { right: 30px; }
-    .hud { display: flex; justify-content: center; gap: 16px; font-size: 14px; }
-    .hud span.label { color: #a0b0ff; margin-right: 4px; }
+    /* 旧モバイルボタンは廃止 */
     .controls { display: flex; justify-content: center; gap: 16px; margin-top: 8px; }
     .ctrl-btn {
       min-width: 80px; padding: 8px 12px; border-radius: 999px;
@@ -121,10 +82,67 @@
       background: #4b5563; color: #9ca3af; cursor: not-allowed; border-color: #6b7280;
     }
     #btn-start:disabled:hover, #btn-start:disabled:active { transform: none; }
-    .title-best { font-size: 13px; margin-bottom: 10px; color: #fbbf24; text-shadow: 0 0 10px rgba(250, 204, 21, 0.8); }
+    .kamiki-ver {
+      font-size: 18px;
+      font-weight: 800;
+      font-style: italic;
+      color: #ffffff;
+      text-align: center;
+      margin-bottom: 12px;
+      letter-spacing: 0.05em;
+      text-shadow: 
+        0 0 4px #fff, 
+        0 0 10px #ffb703, 
+        0 0 20px #fb8500, 
+        0 0 40px #ff8800;
+      animation: orange-neon 1.5s infinite alternate;
+    }
+    @keyframes orange-neon {
+      from { opacity: 0.8; text-shadow: 0 0 4px #fff, 0 0 8px #ffb703, 0 0 15px #fb8500; }
+      to { opacity: 1; text-shadow: 0 0 6px #fff, 0 0 12px #ffb703, 0 0 25px #fb8500, 0 0 50px #ff8800; }
+    }
+    @keyframes chara-neon {
+      from { 
+        filter: drop-shadow(0 0 2px #fff) drop-shadow(0 0 6px #ffb703) drop-shadow(0 0 12px #fb8500);
+      }
+      to { 
+        filter: drop-shadow(0 0 4px #fff) drop-shadow(0 0 10px #ffb703) drop-shadow(0 0 25px #ff8800);
+      }
+    }
     .title-character { width: 120px; height: 120px; margin: 0 auto 10px; display: flex; align-items: center; justify-content: center; }
-    .title-character img { max-width: 100%; max-height: 100%; image-rendering: pixelated; }
+    .title-character img {
+      max-width: 100%;
+      max-height: 100%;
+      image-rendering: pixelated;
+      animation: chara-neon 1.5s infinite alternate;
+    }
     .game-over { composes: overlay; }
+    .game-over-img {
+      width: 100%;
+      max-width: 280px;
+      height: 120px;
+      object-fit: contain;
+      margin: 0 auto 12px auto;
+      display: block;
+      image-rendering: pixelated;
+      animation: pop-in 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+    }
+    .game-over-img.game-over-img-1_5x {
+      max-width: 420px;
+      height: 180px;
+    }
+    .game-over-img.game-over-img-double {
+      max-width: 560px;
+      height: 240px;
+    }
+    .game-over-img.game-over-img-triple {
+      max-width: 840px;
+      height: 360px;
+    }
+    @keyframes pop-in {
+      0% { transform: scale(0.5); opacity: 0; }
+      100% { transform: scale(1); opacity: 1; }
+    }
     .game-over-message { font-size: 16px; font-weight: 600; letter-spacing: 0.06em; margin-bottom: 4px; }
     .game-over-sub { font-size: 12px; color: #cbd5f5; margin-bottom: 4px; }
     .result-scores { font-size: 13px; margin-top: 4px; margin-bottom: 8px; text-align: center; }
@@ -178,14 +196,29 @@
       from { opacity: 0.8; text-shadow: 0 0 4px #fff, 0 0 10px #fff, 0 0 20px #a855f7, 0 0 40px #a855f7; }
       to { opacity: 1; text-shadow: 0 0 6px #fff, 0 0 12px #fff, 0 0 24px #a855f7, 0 0 48px #a855f7, 0 0 90px #7c3aed; }
     }
+    .transition-overlay {
+      position: fixed; inset: 0; background: #000000;
+      z-index: 9999; opacity: 0; pointer-events: none;
+      transition: opacity 0.5s ease-in-out;
+    }
+    .dom-particle {
+      position: fixed; width: 8px; height: 8px; border-radius: 50%;
+      pointer-events: none; z-index: 10000;
+      box-shadow: 0 0 8px currentColor;
+      animation: burst-anim 0.6s cubic-bezier(0.1, 1, 0.3, 1) forwards;
+    }
+    @keyframes burst-anim {
+      0% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+      100% { transform: translate(var(--tx), var(--ty)) scale(0); opacity: 0; }
+    }
   </style>
 </head>
 <body>
   <div class="game-wrapper">
     <div id="start-screen" class="overlay start-screen">
-      <div class="start-card">
+        <div class="start-card">
         <div class="start-title">🟣Purple Jumper🟣</div>
-        <div class="title-best">ベスト <span id="title-best">0</span> 段</div>
+        <div class="kamiki-ver">KAMIKI ver.</div>
         <div class="title-character"><img src="透過済.png" alt="紫おじさん" /></div>
         <div class="start-label">ニックネームを入力してください</div>
         <input id="nickname-input" class="start-input" type="text" maxlength="12" placeholder="例: むらさき太郎" />
@@ -201,33 +234,13 @@
       </div>
     </div>
 
-    <div class="header">
-      <div class="header-left">
-        <button id="btn-top" class="retry-btn top-btn">トップへ戻る</button>
-      </div>
-      <div class="header-center">
-        <h1>🟣Purple Jumper🟣</h1>
-        <div class="hud">
-          <div><span class="label">段</span><span id="height">0</span> 段</div>
-          <div><span class="label">ベスト</span><span id="best">0</span> 段</div>
-        </div>
-      </div>
-      <div class="header-right">
-        <button id="btn-retry" class="retry-btn">再挑戦</button>
-      </div>
-    </div>
-    
     <div class="canvas-wrap">
       <canvas id="game" width="360" height="600"></canvas>
-      <div id="mobile-controls" class="mobile-controls" aria-hidden="true">
-        <button type="button" id="btn-mobile-left" class="mobile-control-btn">◀</button>
-        <button type="button" id="btn-mobile-right" class="mobile-control-btn">▶</button>
-      </div>
     </div>
     
     <div id="game-over" class="overlay game-over">
       <div class="start-card">
-        <div class="game-over-message">ゲームオーバー</div>
+        <img id="game-over-img" src="" alt="GAME OVER" class="game-over-img" />
         <div class="game-over-sub" id="result-nickname"></div>
         <div id="new-record-badge" class="new-record-badge">✨ New Record! ✨</div>
         <div class="result-scores">
@@ -240,6 +253,7 @@
         </div>
       </div>
     </div>
+    <div id="transition-overlay" class="transition-overlay"></div>
   </div>
 
   <script>
@@ -381,6 +395,19 @@
       ojisanImg.src = "透過済.png";
       let ojisanLoaded = false;
       ojisanImg.onload = () => { ojisanLoaded = true; };
+      const ojisanImg1 = new Image();
+      ojisanImg1.src = "透過済1.png";
+      let ojisanLoaded1 = false;
+      ojisanImg1.onload = () => { ojisanLoaded1 = true; };
+      const ojisanImg2 = new Image();
+      ojisanImg2.src = "透過済2.png";
+      let ojisanLoaded2 = false;
+      ojisanImg2.onload = () => { ojisanLoaded2 = true; };
+
+      const bgImg = new Image();
+      bgImg.src = "背景.jpg";
+      let bgImgLoaded = false;
+      bgImg.onload = () => { bgImgLoaded = true; };
 
       let cameraOffsetY = 0;
       let currentStep = 0;
@@ -395,17 +422,20 @@
       const resultCurrentEl = document.getElementById("result-current");
       const resultBestEl = document.getElementById("result-best");
       const resultNicknameEl = document.getElementById("result-nickname");
-      const titleBestEl = document.getElementById("title-best");
       const newRecordBadgeEl = document.getElementById("new-record-badge");
 
-      heightEl.textContent = currentStep.toString();
-      bestEl.textContent = "0";
-      if (titleBestEl) titleBestEl.textContent = "0";
+      if (heightEl) heightEl.textContent = currentStep.toString();
+      if (bestEl) bestEl.textContent = "0";
 
       let rankingDataByNickname = {};
 
       let leftPressed = false, rightPressed = false;
       let paused = false, gameOver = false, gameStarted = false, playerName = "";
+
+      // 宇宙の突風用
+      let windForce = 0;      // 現在の風の強さ（正:右、負:左）
+      let windTimer = 0;      // 風が吹いている残りフレーム数
+      let windParticles = []; // 風の視覚エフェクト
 
       function resetGame() {
         player.x = width / 2;
@@ -417,7 +447,7 @@
         minPlayerY = player.y;
         cameraOffsetY = 0;
         currentStep = 0;
-        heightEl.textContent = "0";
+        if (heightEl) heightEl.textContent = "0";
         resultCurrentEl.textContent = "0";
         if (newRecordBadgeEl) newRecordBadgeEl.style.display = "none";
 
@@ -426,6 +456,9 @@
 
         platforms.length = 0;
         particles.length = 0;
+        windForce = 0;
+        windTimer = 0;
+        windParticles.length = 0;
 
         const bottomY = height - 40;
         platforms.push({ x: width / 2 - PLATFORM_WIDTH / 2, y: bottomY, width: PLATFORM_WIDTH, height: PLATFORM_HEIGHT, type: 'normal', hp: 1, vx: 0 });
@@ -447,19 +480,40 @@
         let vx = 0;
         let hp = 1;
 
-        // 50段以上なら20%の確率で氷の足場（耐久2）
-        if (currentStep >= 50 && r < 0.20) {
-          type = 'ice';
-          hp = 2;
-        } else if (r < 0.35) {
-          // 赤い足場 15%
-          type = 'red';
-        } else if (r < 0.95) {
-          // 動く足場 60%：速度バリエーション 0.5 / 1.0 / 1.5 倍（標準多め）、100段超えでさらに1.5倍
-          const rand = Math.random();
-          const mult = rand < 0.25 ? 0.5 : rand < 0.75 ? 1.0 : 1.5;
-          const baseSpeed = MOVING_PLATFORM_SPEED * mult * (currentStep >= 100 ? 1.5 : 1.0);
-          vx = Math.random() < 0.5 ? baseSpeed : -baseSpeed;
+        if (currentStep <= 100) {
+          // 100段以下：従来どおりの出現確率
+          // 50段以上なら20%の確率で氷の足場（耐久2）
+          if (currentStep >= 50 && r < 0.20) {
+            type = 'ice';
+            hp = 2;
+          } else if (r < 0.35) {
+            // 赤い足場 15%
+            type = 'red';
+          } else if (r < 0.95) {
+            // 動く足場 60%：速度バリエーション 0.5 / 1.0 / 1.5 倍（標準多め）、100段超えでさらに1.5倍
+            const rand = Math.random();
+            const mult = rand < 0.25 ? 0.5 : rand < 0.75 ? 1.0 : 1.5;
+            const baseSpeed = MOVING_PLATFORM_SPEED * mult * (currentStep >= 100 ? 1.5 : 1.0);
+            vx = Math.random() < 0.5 ? baseSpeed : -baseSpeed;
+          }
+        } else {
+          // 100段を超えた場合：動かない通常足場は出現させない
+          const r2 = Math.random();
+          if (r2 < 0.30) {
+            // 氷の足場 30%
+            type = 'ice';
+            hp = 2;
+          } else if (r2 < 0.40) {
+            // 赤い足場 10%
+            type = 'red';
+          } else {
+            // 残り 60% は動く足場
+            type = 'normal'; // 動きのみを持つ通常色の足場
+            const rand = Math.random();
+            const mult = rand < 0.25 ? 0.5 : rand < 0.75 ? 1.0 : 1.5;
+            const baseSpeed = MOVING_PLATFORM_SPEED * mult * 1.5;
+            vx = Math.random() < 0.5 ? baseSpeed : -baseSpeed;
+          }
         }
 
         return { x: Math.random() * (width - PLATFORM_WIDTH), y, width: PLATFORM_WIDTH, height: PLATFORM_HEIGHT, type, hp, vx };
@@ -480,6 +534,22 @@
       function updatePhysics() {
         if (!gameStarted || paused) return;
 
+        // 150段以降：たまに 1 秒だけ吹く突風
+        if (windTimer > 0) {
+          windTimer--;
+          if (windTimer === 0) {
+            windForce = 0;
+          }
+        } else if (currentStep > 150) {
+          // 無風のときだけ、低確率で突風を発生させる
+          if (Math.random() < 0.003) {
+            const dir = Math.random() < 0.5 ? -1 : 1;
+            const mag = 2 + Math.random() * 2; // 2〜4
+            windForce = dir * mag;
+            windTimer = 30; // 約0.5秒間（60FPS想定）
+          }
+        }
+
         // --- 1. 高度ベースのスコア計算 ---
         if (player.y < minPlayerY) {
           minPlayerY = player.y;
@@ -487,10 +557,10 @@
           let calcStep = Math.floor((startY - minPlayerY) / PLATFORM_GAP);
           if (calcStep > currentStep) {
             currentStep = calcStep;
-            heightEl.textContent = currentStep.toString();
+            if (heightEl) heightEl.textContent = currentStep.toString();
             if (currentStep > bestStep) {
               bestStep = currentStep;
-              bestEl.textContent = bestStep.toString();
+              if (bestEl) bestEl.textContent = bestStep.toString();
             }
           }
         }
@@ -560,6 +630,12 @@
           }
         }
 
+        // 空中にいる間だけ風の影響を受ける（突風が吹いているときのみ）
+        if (windForce !== 0 && player.vy !== 0) {
+          player.x += windForce;
+          player.x = (player.x % width + width) % width;
+        }
+
         const midY = height * 0.5;
         const screenY = player.y - cameraOffsetY;
         if (screenY < midY && player.vy < 0) {
@@ -606,25 +682,19 @@
 
       function drawBackground() {
         const step = currentStep;
-        // 0〜500段を 10段刻みで丸めた進行度（0.0〜1.0）
-        const progress = Math.min(Math.floor(step / 10) * 10 / 500, 1);
 
-        // スタート時の淡い空＋大地の薄緑
-        const startTop = { r: 180, g: 235, b: 220 };  // 少し水色がかった淡い緑
-        const startBottom = { r: 120, g: 220, b: 160 }; // 明るめの薄緑
-        const endColor = { r: 0, g: 0, b: 0 }; // 完全な黒
+        // 背景画像が読み込まれていればそれを描画、まだならシンプルなグラデーションでフォールバック
+        if (bgImgLoaded) {
+          ctx.drawImage(bgImg, 0, 0, width, height);
+        } else {
+          const grad = ctx.createLinearGradient(0, 0, 0, height);
+          grad.addColorStop(0, "#0f172a");
+          grad.addColorStop(1, "#020617");
+          ctx.fillStyle = grad;
+          ctx.fillRect(0, 0, width, height);
+        }
 
-        const topColor = lerpColor(startTop, endColor, progress);
-        const bottomColor = lerpColor(startBottom, endColor, progress);
-
-        // 背景全体のグラデーション
-        const grad = ctx.createLinearGradient(0, 0, 0, height);
-        grad.addColorStop(0, topColor);
-        grad.addColorStop(1, bottomColor);
-        ctx.fillStyle = grad;
-        ctx.fillRect(0, 0, width, height);
-
-        // 星（宇宙）の演出：300段から500段にかけてフェードイン
+        // 星（宇宙）の演出：300段から500段にかけてフェードイン（背景画像の上に重ねる）
         const starProgress = Math.min(1, Math.max(0, (step - 300) / 200));
         if (starProgress <= 0) return;
 
@@ -647,6 +717,35 @@
           ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
           ctx.fill();
         });
+      }
+
+      function drawWind() {
+        if (Math.abs(windForce) <= 0.1) return;
+        const speed = windForce * 3;
+        if (Math.random() < 0.4) {
+          windParticles.push({
+            x: windForce > 0 ? -30 : width + 30,
+            y: Math.random() * height,
+            len: 15 + Math.random() * 25,
+            alpha: 0.2 + Math.random() * 0.3
+          });
+        }
+        ctx.save();
+        for (let i = windParticles.length - 1; i >= 0; i--) {
+          const p = windParticles[i];
+          p.x += speed;
+          if (p.x < -50 || p.x > width + 50) {
+            windParticles.splice(i, 1);
+            continue;
+          }
+          ctx.strokeStyle = "rgba(255, 255, 255, " + p.alpha + ")";
+          ctx.lineWidth = 2;
+          ctx.beginPath();
+          ctx.moveTo(p.x, p.y);
+          ctx.lineTo(p.x + (windForce > 0 ? p.len : -p.len), p.y);
+          ctx.stroke();
+        }
+        ctx.restore();
       }
 
       function drawPlatforms() {
@@ -672,6 +771,11 @@
           ctx.lineTo(x + radius, baseY + h); ctx.quadraticCurveTo(x, baseY + h, x, baseY + h - radius);
           ctx.lineTo(x, baseY + radius); ctx.quadraticCurveTo(x, baseY, x + radius, baseY);
           ctx.fill();
+
+          // すべての足場に太めの黒い縁取りを追加
+          ctx.strokeStyle = "#000000";
+          ctx.lineWidth = 4;
+          ctx.stroke();
 
           // 氷のヒビ割れ描画（耐久2なので hp===1 の時のみ）
           if (p.type === 'ice' && p.hp < 2) {
@@ -739,18 +843,25 @@
         function drawSinglePlayerAt(drawX) {
           ctx.save();
           ctx.translate(drawX, feetY);
-          let stretchY = 1;
-          let stretchX = 1;
-          if (!player.onGround) {
-            if (player.vy < -2) { stretchY = 1.2; stretchX = 0.92; }
-            else if (player.vy > 3) { stretchY = 0.9; stretchX = 1.05; }
+          var imgToDraw = ojisanImg;
+          var imgLoaded = ojisanLoaded;
+          var sizeScale = 1;
+          if (player.vy > 1.5 && player.vy < 6) {
+            imgToDraw = ojisanImg1;
+            imgLoaded = ojisanLoaded1;
+            sizeScale = 0.95;
+          } else if (player.vy >= 6) {
+            imgToDraw = ojisanImg2;
+            imgLoaded = ojisanLoaded2;
+            sizeScale = 0.7;
           }
-          ctx.scale(stretchX, stretchY);
-          if (ojisanLoaded) {
-            const imgW = ojisanImg.width; const imgH = ojisanImg.height;
-            const targetHeight = player.height * 1.5;
-            const aspect = imgW / imgH; const targetWidth = targetHeight * aspect;
-            ctx.drawImage(ojisanImg, -targetWidth / 2, -targetHeight, targetWidth, targetHeight);
+          if (imgLoaded) {
+            const imgW = imgToDraw.width;
+            const imgH = imgToDraw.height;
+            const targetHeight = player.height * 1.5 * sizeScale;
+            const aspect = imgW / imgH;
+            const targetWidth = targetHeight * aspect;
+            ctx.drawImage(imgToDraw, -targetWidth / 2, -targetHeight, targetWidth, targetHeight);
           } else {
             ctx.fillStyle = "#7c3aed";
             ctx.fillRect(-player.width / 2, -player.height, player.width, player.height);
@@ -771,10 +882,19 @@
 
       function drawScoreOverlay() {
         ctx.save();
-        ctx.font = "bold 64px sans-serif";
+        const text = currentStep + " 段";
+        ctx.font = "bold 32px sans-serif";
         ctx.textAlign = "center";
-        ctx.fillStyle = "rgba(255, 255, 255, 0.2)";
-        ctx.fillText(currentStep + " 段", width / 2, 120);
+        ctx.textBaseline = "top";
+        const x = width / 2;
+        const y = 45;
+        // 白い太めの縁取り
+        ctx.strokeStyle = "white";
+        ctx.lineWidth = 4;
+        ctx.strokeText(text, x, y);
+        // 中身を鮮やかな赤で塗りつぶし
+        ctx.fillStyle = "#ff3333";
+        ctx.fillText(text, x, y);
         ctx.restore();
       }
 
@@ -783,8 +903,24 @@
         if (overEl) overEl.style.display = "flex";
         const gw = document.querySelector(".game-wrapper");
         if (gw) gw.classList.remove("game-playing");
-        const mobileControls = document.getElementById("mobile-controls");
-        if (mobileControls) mobileControls.style.display = "none";
+        var gameOverImgs = ["GAMEOVER.png", "GAMEOVER1.png", "GAMEOVER2.png", "GAMEOVER3.png", "GAMEOVER4.png", "GAMEOVER5.png", "GAMEOVER6.png", "GAMEOVER7.png", "GAMEOVER8.png", "GAMEOVER9.png", "GAMEOVER10.png", "GAMEOVER11.png", "GAMEOVER12.png", "GAMEOVER13.png", "GAMEOVER14.png", "GAMEOVER15.png"];
+        var gameOverImgEl = document.getElementById("game-over-img");
+        if (gameOverImgEl) {
+          var idx = Math.floor(Math.random() * gameOverImgs.length);
+          var chosen = gameOverImgs[idx];
+          gameOverImgEl.src = "";
+          var tripleSizeImgs = ["GAMEOVER3.png", "GAMEOVER8.png", "GAMEOVER10.png", "GAMEOVER15.png"];
+          var doubleSizeImgs = ["GAMEOVER5.png", "GAMEOVER6.png", "GAMEOVER7.png", "GAMEOVER11.png", "GAMEOVER12.png", "GAMEOVER14.png"];
+          gameOverImgEl.classList.remove("game-over-img-1_5x", "game-over-img-double", "game-over-img-triple");
+          if (tripleSizeImgs.indexOf(chosen) >= 0) {
+            gameOverImgEl.classList.add("game-over-img-triple");
+          } else if (doubleSizeImgs.indexOf(chosen) >= 0) {
+            gameOverImgEl.classList.add("game-over-img-double");
+          } else {
+            gameOverImgEl.classList.add("game-over-img-1_5x");
+          }
+          gameOverImgEl.src = chosen;
+        }
         resultCurrentEl.textContent = currentStep.toString();
         resultBestEl.textContent = bestStep.toString();
         resultNicknameEl.textContent = playerName ? `プレイヤー: ${playerName}` : "プレイヤー: ななしさん";
@@ -810,6 +946,7 @@
         updatePhysics();
         ctx.clearRect(0, 0, width, height);
         drawBackground();
+        drawWind();
         drawPlatforms();
         drawParticles();
         drawPlayer();
@@ -834,13 +971,39 @@
         else if (e.key === "ArrowRight" || e.key === "d" || e.key === "D") rightPressed = false;
       });
 
-      const btnLeft = document.getElementById("btn-left");
-      const btnRight = document.getElementById("btn-right");
-      const btnMobileLeft = document.getElementById("btn-mobile-left");
-      const btnMobileRight = document.getElementById("btn-mobile-right");
+      // 画面の左右タップで移動
+      function handlePointerDown(clientX) {
+        const center = window.innerWidth / 2;
+        if (clientX < center) {
+          leftPressed = true;
+          rightPressed = false;
+        } else {
+          rightPressed = true;
+          leftPressed = false;
+        }
+      }
+      function handlePointerUp() {
+        leftPressed = false;
+        rightPressed = false;
+      }
+
+      window.addEventListener("mousedown", function (e) {
+        handlePointerDown(e.clientX);
+      });
+      window.addEventListener("mouseup", function () {
+        handlePointerUp();
+      });
+      window.addEventListener("touchstart", function (e) {
+        if (!e.touches || e.touches.length === 0) return;
+        const touch = e.touches[0];
+        handlePointerDown(touch.clientX);
+      }, { passive: true });
+      window.addEventListener("touchend", function () {
+        handlePointerUp();
+      });
+
       const btnRetry = document.getElementById("btn-retry");
       const btnTop = document.getElementById("btn-top");
-      const mobileControlsEl = document.getElementById("mobile-controls");
       const gameOverEl = document.getElementById("game-over");
       const btnGameOverRetry = document.getElementById("btn-gameover-retry");
       const btnResultTop = document.getElementById("btn-result-top");
@@ -861,7 +1024,6 @@
       function updateBestScoreDisplay() {
         const nick = (nicknameInput && nicknameInput.value ? nicknameInput.value : "").trim();
         const score = nick && rankingDataByNickname[nick] ? Number(rankingDataByNickname[nick].score) : 0;
-        if (titleBestEl) titleBestEl.textContent = score.toString();
         bestStep = score;
         if (bestEl) bestEl.textContent = score.toString();
       }
@@ -963,31 +1125,60 @@
         });
       }
 
-      function bindButtonHold(btn, onDown, onUp) {
-        btn.addEventListener("mousedown", function(e) { e.preventDefault(); e.stopPropagation(); onDown(); });
-        btn.addEventListener("mouseup", onUp); btn.addEventListener("mouseleave", onUp);
-        btn.addEventListener("touchstart", function(e) { e.preventDefault(); e.stopPropagation(); onDown(); }, { passive: false });
-        btn.addEventListener("touchend", onUp); btn.addEventListener("touchcancel", onUp);
+      function playStartTransition(e, callback) {
+        var x = e.clientX != null ? e.clientX : (e.touches && e.touches[0] ? e.touches[0].clientX : window.innerWidth / 2);
+        var y = e.clientY != null ? e.clientY : (e.touches && e.touches[0] ? e.touches[0].clientY : window.innerHeight / 2);
+        var colors = ["#a855f7", "#7c3aed", "#fb8500", "#ffb703", "#ffffff", "#38bdf8"];
+        var particles = [];
+        var count = 60 + Math.floor(Math.random() * 21);
+        for (var i = 0; i < count; i++) {
+          var el = document.createElement("div");
+          el.className = "dom-particle";
+          el.style.left = x + "px";
+          el.style.top = y + "px";
+          var size = 4 + Math.floor(Math.random() * 15);
+          el.style.width = size + "px";
+          el.style.height = size + "px";
+          var angle = Math.random() * Math.PI * 2;
+          var radius = 50 + Math.random() * 300;
+          var tx = radius * Math.cos(angle);
+          var ty = radius * Math.sin(angle);
+          el.style.setProperty("--tx", tx + "px");
+          el.style.setProperty("--ty", ty + "px");
+          var c = colors[Math.floor(Math.random() * colors.length)];
+          el.style.background = c;
+          el.style.color = c;
+          document.body.appendChild(el);
+          particles.push(el);
+        }
+        var overlay = document.getElementById("transition-overlay");
+        if (overlay) overlay.style.opacity = "1";
+        setTimeout(function () {
+          if (typeof callback === "function") callback();
+          setTimeout(function () {
+            if (overlay) overlay.style.opacity = "0";
+            setTimeout(function () {
+              particles.forEach(function (p) { if (p.parentNode) p.remove(); });
+            }, 700);
+          }, 50);
+        }, 500);
       }
-      if (btnLeft) bindButtonHold(btnLeft, () => leftPressed = true, () => leftPressed = false);
-      if (btnRight) bindButtonHold(btnRight, () => rightPressed = true, () => rightPressed = false);
-      if (btnMobileLeft) bindButtonHold(btnMobileLeft, () => leftPressed = true, () => leftPressed = false);
-      if (btnMobileRight) bindButtonHold(btnMobileRight, () => rightPressed = true, () => rightPressed = false);
-      btnRetry.addEventListener("click", function () {
+
+      if (btnRetry) btnRetry.addEventListener("click", function () {
         previousBest = bestStep;
         resetGame();
         if (gameOverEl) gameOverEl.style.display = "none";
         const gw = document.querySelector(".game-wrapper");
         if (gw) gw.classList.add("game-playing");
-        if (mobileControlsEl) mobileControlsEl.style.display = "block";
       });
-      btnGameOverRetry.addEventListener("click", function () {
-        previousBest = bestStep;
-        resetGame();
-        if (gameOverEl) gameOverEl.style.display = "none";
-        const gw = document.querySelector(".game-wrapper");
-        if (gw) gw.classList.add("game-playing");
-        if (mobileControlsEl) mobileControlsEl.style.display = "block";
+      btnGameOverRetry.addEventListener("click", function (e) {
+        playStartTransition(e, function () {
+          previousBest = bestStep;
+          resetGame();
+          if (gameOverEl) gameOverEl.style.display = "none";
+          var gw = document.querySelector(".game-wrapper");
+          if (gw) gw.classList.add("game-playing");
+        });
       });
       async function goToTop() {
         gameStarted = false; paused = false; resetGame();
@@ -995,22 +1186,22 @@
         if (startScreenEl) startScreenEl.style.display = "flex";
         const gw = document.querySelector(".game-wrapper");
         if (gw) gw.classList.remove("game-playing");
-        if (mobileControlsEl) mobileControlsEl.style.display = "none";
         await loadTopRanking();
       }
-      btnTop.addEventListener("click", function () { goToTop(); });
+      if (btnTop) btnTop.addEventListener("click", function () { goToTop(); });
       btnResultTop.addEventListener("click", function () { goToTop(); });
-      btnStart.addEventListener("click", function () {
+      btnStart.addEventListener("click", function (e) {
         if (btnStart.disabled) return;
-        playerName = nicknameInput.value.trim() || "ななしさん";
-        localStorage.setItem("murasaki_ojisan_player_name", playerName);
-        previousBest = bestStep;
-        gameStarted = true; paused = false;
-        if (startScreenEl) startScreenEl.style.display = "none";
-        const gw = document.querySelector(".game-wrapper");
-        if (gw) gw.classList.add("game-playing");
-        if (mobileControlsEl) mobileControlsEl.style.display = "block";
-        resetGame();
+        playStartTransition(e, function () {
+          playerName = nicknameInput.value.trim() || "ななしさん";
+          localStorage.setItem("murasaki_ojisan_player_name", playerName);
+          previousBest = bestStep;
+          gameStarted = true; paused = false;
+          if (startScreenEl) startScreenEl.style.display = "none";
+          var gw = document.querySelector(".game-wrapper");
+          if (gw) gw.classList.add("game-playing");
+          resetGame();
+        });
       });
 
       function updateStartButtonState() {
@@ -1028,7 +1219,6 @@
       const savedName = localStorage.getItem("murasaki_ojisan_player_name");
       if (savedName) { playerName = savedName; if (nicknameInput) nicknameInput.value = savedName; updateStartButtonState(); }
       if (startScreenEl) startScreenEl.style.display = "flex";
-      if (mobileControlsEl) mobileControlsEl.style.display = "none";
       resetGame();
       loadTopRanking();
       loop();
