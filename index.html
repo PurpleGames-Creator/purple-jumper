@@ -314,6 +314,55 @@
         return audioCtx;
       }
 
+      const bgmAudio = new Audio("play.mp3");
+      bgmAudio.loop = true;
+      bgmAudio.preload = "auto";
+      const BGM_BASE_VOLUME = 0.16;
+      let bgmFadeRaf = 0;
+
+      function cancelBgmFade() {
+        if (bgmFadeRaf) {
+          cancelAnimationFrame(bgmFadeRaf);
+          bgmFadeRaf = 0;
+        }
+      }
+
+      function startBgm() {
+        cancelBgmFade();
+        bgmAudio.volume = BGM_BASE_VOLUME;
+        bgmAudio.currentTime = 0;
+        const p = bgmAudio.play();
+        if (p && typeof p.catch === "function") p.catch(function () { /* ユーザー操作前などで再生不可の場合は無視 */ });
+      }
+
+      function stopBgmImmediate() {
+        cancelBgmFade();
+        bgmAudio.pause();
+        bgmAudio.currentTime = 0;
+        bgmAudio.volume = BGM_BASE_VOLUME;
+      }
+
+      function fadeOutBgm(durationMs) {
+        cancelBgmFade();
+        if (bgmAudio.paused) return;
+        const fadeMs = Math.max(100, Number(durationMs) || 1200);
+        const startVolume = bgmAudio.volume;
+        const startedAt = performance.now();
+        function tick(nowMs) {
+          const t = Math.min(1, (nowMs - startedAt) / fadeMs);
+          bgmAudio.volume = Math.max(0, startVolume * (1 - t));
+          if (t < 1) {
+            bgmFadeRaf = requestAnimationFrame(tick);
+          } else {
+            bgmFadeRaf = 0;
+            bgmAudio.pause();
+            bgmAudio.currentTime = 0;
+            bgmAudio.volume = BGM_BASE_VOLUME;
+          }
+        }
+        bgmFadeRaf = requestAnimationFrame(tick);
+      }
+
       function playJumpSound() {
         const ctxA = getAudioCtx();
         if (!ctxA) return;
@@ -401,6 +450,48 @@
         noise.stop(now + 0.35);
       }
 
+      let windSoundNodes = null;
+      function ensureWindSoundNodes() {
+        if (windSoundNodes) return windSoundNodes;
+        const ctxA = getAudioCtx();
+        if (!ctxA) return null;
+        const noiseBufferSize = Math.max(1, Math.floor(ctxA.sampleRate * 2));
+        const noiseBuffer = ctxA.createBuffer(1, noiseBufferSize, ctxA.sampleRate);
+        const data = noiseBuffer.getChannelData(0);
+        for (let i = 0; i < noiseBufferSize; i++) {
+          data[i] = Math.random() * 2 - 1;
+        }
+        const noise = ctxA.createBufferSource();
+        noise.buffer = noiseBuffer;
+        noise.loop = true;
+        const hp = ctxA.createBiquadFilter();
+        hp.type = "highpass";
+        hp.frequency.setValueAtTime(350, ctxA.currentTime);
+        const bp = ctxA.createBiquadFilter();
+        bp.type = "bandpass";
+        bp.frequency.setValueAtTime(900, ctxA.currentTime);
+        bp.Q.setValueAtTime(0.7, ctxA.currentTime);
+        const gain = ctxA.createGain();
+        gain.gain.setValueAtTime(0.0, ctxA.currentTime);
+        noise.connect(hp).connect(bp).connect(gain).connect(ctxA.destination);
+        noise.start();
+        windSoundNodes = { noise: noise, gain: gain };
+        return windSoundNodes;
+      }
+
+      function updateWindSound(force) {
+        const nodes = ensureWindSoundNodes();
+        if (!nodes) return;
+        const ctxA = getAudioCtx();
+        if (!ctxA) return;
+        const now = ctxA.currentTime;
+        const intensity = Math.min(1, Math.abs(force) / 4);
+        const targetGain = intensity > 0.02 ? 0.05 + intensity * 0.12 : 0.0;
+        nodes.gain.gain.cancelScheduledValues(now);
+        nodes.gain.gain.setValueAtTime(nodes.gain.gain.value, now);
+        nodes.gain.gain.linearRampToValueAtTime(targetGain, now + 0.08);
+      }
+
       const player = { x: width / 2, y: height - 80, width: 40, height: 80, vy: 0, onGround: false };
       
       const platforms = [];
@@ -485,6 +576,7 @@
         windForce = 0;
         windTimer = 0;
         windParticles.length = 0;
+        updateWindSound(0);
 
         const bottomY = height - 40;
         platforms.push({ x: width / 2 - PLATFORM_WIDTH / 2, y: bottomY, width: PLATFORM_WIDTH, height: PLATFORM_HEIGHT, type: 'normal', hp: 1, vx: 0 });
@@ -558,9 +650,12 @@
       }
 
       function updatePhysics() {
-        if (!gameStarted || paused) return;
+        if (!gameStarted || paused) {
+          updateWindSound(0);
+          return;
+        }
 
-        // 150段以降：たまに 1 秒だけ吹く突風
+        // 150段以降：たまに短時間だけ吹く突風
         if (windTimer > 0) {
           windTimer--;
           if (windTimer === 0) {
@@ -572,9 +667,10 @@
             const dir = Math.random() < 0.5 ? -1 : 1;
             const mag = 2 + Math.random() * 2; // 2〜4
             windForce = dir * mag;
-            windTimer = 30; // 約0.5秒間（60FPS想定）
+            windTimer = 30 + Math.floor(Math.random() * 13); // 約0.5〜0.7秒間（60FPS想定）
           }
         }
+        updateWindSound(windForce);
 
         // --- 1. 高度ベースのスコア計算 ---
         if (player.y < minPlayerY) {
@@ -925,6 +1021,7 @@
       }
 
       async function showResultScreen() {
+        fadeOutBgm(1400);
         const overEl = document.getElementById("game-over");
         if (overEl) overEl.style.display = "flex";
         const gw = document.querySelector(".game-wrapper");
@@ -1204,6 +1301,7 @@
       if (btnRetry) btnRetry.addEventListener("click", function () {
         previousBest = bestStep;
         resetGame();
+        startBgm();
         if (gameOverEl) gameOverEl.style.display = "none";
         const gw = document.querySelector(".game-wrapper");
         if (gw) gw.classList.add("game-playing");
@@ -1212,12 +1310,14 @@
         playStartTransition(e, function () {
           previousBest = bestStep;
           resetGame();
+          startBgm();
           if (gameOverEl) gameOverEl.style.display = "none";
           var gw = document.querySelector(".game-wrapper");
           if (gw) gw.classList.add("game-playing");
         });
       });
       async function goToTop() {
+        stopBgmImmediate();
         gameStarted = false; paused = false; resetGame();
         if (gameOverEl) gameOverEl.style.display = "none";
         if (startScreenEl) startScreenEl.style.display = "flex";
@@ -1234,6 +1334,7 @@
           localStorage.setItem("murasaki_ojisan_player_name", playerName);
           previousBest = bestStep;
           gameStarted = true; paused = false;
+          startBgm();
           if (startScreenEl) startScreenEl.style.display = "none";
           var gw = document.querySelector(".game-wrapper");
           if (gw) gw.classList.add("game-playing");
