@@ -65,6 +65,16 @@
       position: absolute; inset: 0; display: none; align-items: center; justify-content: center;
       background: rgba(15, 23, 42, 0.88); flex-direction: column; gap: 12px; z-index: 10;
     }
+    .start-brand-logo {
+      position: absolute; top: 24px; left: 10px; z-index: 11;
+      display: block; line-height: 0; opacity: 0.95;
+    }
+    .start-brand-logo img {
+      display: block; height: 80px; width: auto; max-width: min(320px, 84vw);
+      object-fit: contain; pointer-events: none;
+    }
+    .start-brand-logo:active { opacity: 0.85; }
+    /* position:relative は付けない。付けると .overlay の position:absolute を上書きし、トップ画面が縦並びでキャンバス下に回り込む */
     .start-screen { display: flex; }
     .start-card {
       padding: 24px 20px; border-radius: 18px;
@@ -229,6 +239,9 @@
 <body>
   <div class="game-wrapper">
     <div id="start-screen" class="overlay start-screen">
+        <a class="start-brand-logo" href="https://purple-park.vercel.app/" target="_blank" rel="noopener noreferrer" aria-label="Purple Park サイトへ">
+          <img src="logo.png" alt="Purple Park" />
+        </a>
         <div class="start-card">
         <div class="start-title">🟣Purple Jumper🟣</div>
         <div class="kamiki-ver">KAMIKI ver.</div>
