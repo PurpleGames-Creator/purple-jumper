@@ -317,19 +317,27 @@
       const bgmAudio = new Audio("play.mp3");
       bgmAudio.loop = true;
       bgmAudio.preload = "auto";
-      const BGM_BASE_VOLUME = 0.16;
-      let bgmFadeRaf = 0;
+      const BGM_BASE_VOLUME = 0.1;
+      const isCoarsePointer = !!(window.matchMedia && window.matchMedia("(pointer: coarse)").matches);
+      const isTouchCapable = ("ontouchstart" in window) || (navigator.maxTouchPoints > 0);
+      const isMobileUA = /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent || "");
+      const isMobileLikeDevice = isCoarsePointer || (isTouchCapable && isMobileUA);
+      const BGM_MOBILE_MULTIPLIER = 0.25;
+      function getBgmVolume() {
+        return isMobileLikeDevice ? BGM_BASE_VOLUME * BGM_MOBILE_MULTIPLIER : BGM_BASE_VOLUME;
+      }
+      let bgmFadeTimer = 0;
 
       function cancelBgmFade() {
-        if (bgmFadeRaf) {
-          cancelAnimationFrame(bgmFadeRaf);
-          bgmFadeRaf = 0;
+        if (bgmFadeTimer) {
+          clearInterval(bgmFadeTimer);
+          bgmFadeTimer = 0;
         }
       }
 
       function startBgm() {
         cancelBgmFade();
-        bgmAudio.volume = BGM_BASE_VOLUME;
+        bgmAudio.volume = getBgmVolume();
         bgmAudio.currentTime = 0;
         const p = bgmAudio.play();
         if (p && typeof p.catch === "function") p.catch(function () { /* ユーザー操作前などで再生不可の場合は無視 */ });
@@ -339,7 +347,7 @@
         cancelBgmFade();
         bgmAudio.pause();
         bgmAudio.currentTime = 0;
-        bgmAudio.volume = BGM_BASE_VOLUME;
+        bgmAudio.volume = getBgmVolume();
       }
 
       function fadeOutBgm(durationMs) {
@@ -347,21 +355,27 @@
         if (bgmAudio.paused) return;
         const fadeMs = Math.max(100, Number(durationMs) || 1200);
         const startVolume = bgmAudio.volume;
-        const startedAt = performance.now();
-        function tick(nowMs) {
-          const t = Math.min(1, (nowMs - startedAt) / fadeMs);
+        const tickMs = 50;
+        const totalSteps = Math.max(1, Math.ceil(fadeMs / tickMs));
+        let step = 0;
+        bgmFadeTimer = setInterval(function () {
+          step++;
+          const t = Math.min(1, step / totalSteps);
           bgmAudio.volume = Math.max(0, startVolume * (1 - t));
-          if (t < 1) {
-            bgmFadeRaf = requestAnimationFrame(tick);
-          } else {
-            bgmFadeRaf = 0;
+          if (t >= 1) {
+            cancelBgmFade();
             bgmAudio.pause();
             bgmAudio.currentTime = 0;
-            bgmAudio.volume = BGM_BASE_VOLUME;
+            bgmAudio.volume = getBgmVolume();
           }
-        }
-        bgmFadeRaf = requestAnimationFrame(tick);
+        }, tickMs);
       }
+
+      document.addEventListener("visibilitychange", function () {
+        if (document.hidden) {
+          cancelBgmFade();
+        }
+      });
 
       function playJumpSound() {
         const ctxA = getAudioCtx();
