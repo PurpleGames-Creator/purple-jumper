@@ -317,16 +317,44 @@
       const bgmAudio = new Audio("play.mp3");
       bgmAudio.loop = true;
       bgmAudio.preload = "auto";
-      const BGM_BASE_VOLUME = 0.1;
+      bgmAudio.playsInline = true;
+      // iOS Safari では <audio>.volume が実質効かないことが多いので、WebAudio の Gain で制御する
+      const BGM_BASE_GAIN = 0.08;
       const isCoarsePointer = !!(window.matchMedia && window.matchMedia("(pointer: coarse)").matches);
       const isTouchCapable = ("ontouchstart" in window) || (navigator.maxTouchPoints > 0);
       const isMobileUA = /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent || "");
       const isMobileLikeDevice = isCoarsePointer || (isTouchCapable && isMobileUA);
-      const BGM_MOBILE_MULTIPLIER = 0.25;
-      function getBgmVolume() {
-        return isMobileLikeDevice ? BGM_BASE_VOLUME * BGM_MOBILE_MULTIPLIER : BGM_BASE_VOLUME;
+      const BGM_MOBILE_GAIN_MULTIPLIER = 0.35;
+      function getBgmTargetGain() {
+        return isMobileLikeDevice ? BGM_BASE_GAIN * BGM_MOBILE_GAIN_MULTIPLIER : BGM_BASE_GAIN;
       }
       let bgmFadeTimer = 0;
+      let bgmGainNode = null;
+
+      function ensureBgmAudioGraph() {
+        const ctxA = getAudioCtx();
+        if (!ctxA || bgmGainNode) return bgmGainNode;
+        try {
+          const src = ctxA.createMediaElementSource(bgmAudio);
+          const gain = ctxA.createGain();
+          gain.gain.setValueAtTime(0.0001, ctxA.currentTime);
+          src.connect(gain).connect(ctxA.destination);
+          bgmGainNode = gain;
+        } catch (_e) {
+          bgmGainNode = null;
+        }
+        return bgmGainNode;
+      }
+
+      function setBgmOutputGain(value) {
+        const ctxA = getAudioCtx();
+        const g = ensureBgmAudioGraph();
+        if (g && ctxA) {
+          g.gain.setValueAtTime(Math.max(0, value), ctxA.currentTime);
+        } else {
+          bgmAudio.volume = Math.max(0, Math.min(1, value));
+        }
+      }
 
       function cancelBgmFade() {
         if (bgmFadeTimer) {
@@ -337,8 +365,15 @@
 
       function startBgm() {
         cancelBgmFade();
-        bgmAudio.volume = getBgmVolume();
+        bgmAudio.volume = 1;
+        ensureBgmAudioGraph();
+        setBgmOutputGain(getBgmTargetGain());
         bgmAudio.currentTime = 0;
+        const ctxA = getAudioCtx();
+        if (ctxA && ctxA.state === "suspended" && ctxA.resume) {
+          const r = ctxA.resume();
+          if (r && typeof r.catch === "function") r.catch(function () { /* 無視 */ });
+        }
         const p = bgmAudio.play();
         if (p && typeof p.catch === "function") p.catch(function () { /* ユーザー操作前などで再生不可の場合は無視 */ });
       }
@@ -347,26 +382,35 @@
         cancelBgmFade();
         bgmAudio.pause();
         bgmAudio.currentTime = 0;
-        bgmAudio.volume = getBgmVolume();
+        bgmAudio.volume = 1;
+        setBgmOutputGain(getBgmTargetGain());
       }
 
       function fadeOutBgm(durationMs) {
         cancelBgmFade();
         if (bgmAudio.paused) return;
+        ensureBgmAudioGraph();
         const fadeMs = Math.max(100, Number(durationMs) || 1200);
-        const startVolume = bgmAudio.volume;
+        const ctxA = getAudioCtx();
+        const startGain = bgmGainNode && ctxA ? bgmGainNode.gain.value : bgmAudio.volume;
         const tickMs = 50;
         const totalSteps = Math.max(1, Math.ceil(fadeMs / tickMs));
         let step = 0;
         bgmFadeTimer = setInterval(function () {
           step++;
           const t = Math.min(1, step / totalSteps);
-          bgmAudio.volume = Math.max(0, startVolume * (1 - t));
+          const next = Math.max(0, startGain * (1 - t));
+          if (bgmGainNode && ctxA) {
+            bgmGainNode.gain.setValueAtTime(next, ctxA.currentTime);
+          } else {
+            bgmAudio.volume = next;
+          }
           if (t >= 1) {
             cancelBgmFade();
             bgmAudio.pause();
             bgmAudio.currentTime = 0;
-            bgmAudio.volume = getBgmVolume();
+            bgmAudio.volume = 1;
+            setBgmOutputGain(getBgmTargetGain());
           }
         }, tickMs);
       }
