@@ -969,7 +969,6 @@
         if (!charSelectStage || charSwapBusy) return;
         if (toIndex !== 0 && toIndex !== 1) return;
         if (toIndex === selectedCharacterIndex) return;
-        playCharacterSelectWhoosh();
         if (window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
           applyPlayableCharacter(toIndex);
           return;
@@ -1007,6 +1006,7 @@
           if (!btn || charSwapBusy) return;
           var idx = parseInt(btn.getAttribute("data-char"), 10);
           if (idx !== 0 && idx !== 1) return;
+          playCharacterSelectWhoosh();
           if (idx === selectedCharacterIndex) return;
           runCharacterSwap(idx);
         });
