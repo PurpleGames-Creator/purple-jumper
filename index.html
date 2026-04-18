@@ -148,7 +148,13 @@
       margin: 0 auto 12px auto;
       display: block;
       image-rendering: pixelated;
-      animation: pop-in 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+      filter:
+        drop-shadow(0 0 5px rgba(196, 181, 253, 0.42))
+        drop-shadow(0 0 14px rgba(139, 92, 246, 0.26))
+        drop-shadow(0 0 26px rgba(76, 29, 149, 0.18));
+      animation:
+        pop-in 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards,
+        game-over-neon-pulse 2.8s ease-in-out 0.35s infinite alternate both;
     }
     .game-over-img.game-over-img-1_5x {
       max-width: 420px;
@@ -165,6 +171,20 @@
     @keyframes pop-in {
       0% { transform: scale(0.5); opacity: 0; }
       100% { transform: scale(1); opacity: 1; }
+    }
+    @keyframes game-over-neon-pulse {
+      from {
+        filter:
+          drop-shadow(0 0 4px rgba(196, 181, 253, 0.34))
+          drop-shadow(0 0 12px rgba(139, 92, 246, 0.2))
+          drop-shadow(0 0 22px rgba(76, 29, 149, 0.14));
+      }
+      to {
+        filter:
+          drop-shadow(0 0 9px rgba(216, 180, 254, 0.52))
+          drop-shadow(0 0 20px rgba(139, 92, 246, 0.32))
+          drop-shadow(0 0 34px rgba(91, 33, 182, 0.24));
+      }
     }
     .game-over-message { font-size: 16px; font-weight: 600; letter-spacing: 0.06em; margin-bottom: 4px; }
     .game-over-sub { font-size: 12px; color: #cbd5f5; margin-bottom: 4px; }
@@ -1084,7 +1104,7 @@
         if (overEl) overEl.style.display = "flex";
         const gw = document.querySelector(".game-wrapper");
         if (gw) gw.classList.remove("game-playing");
-        var gameOverImgs = ["GAMEOVER.png", "GAMEOVER1.png", "GAMEOVER2.png", "GAMEOVER3.png", "GAMEOVER4.png", "GAMEOVER5.png", "GAMEOVER6.png", "GAMEOVER7.png", "GAMEOVER8.png", "GAMEOVER9.png", "GAMEOVER10.png", "GAMEOVER11.png", "GAMEOVER12.png", "GAMEOVER13.png", "GAMEOVER14.png", "GAMEOVER15.png"];
+        var gameOverImgs = ["GAMEOVER.png", "GAMEOVER1.png", "GAMEOVER2.png", "GAMEOVER3.png", "GAMEOVER4.png", "GAMEOVER5.png", "GAMEOVER6.png", "GAMEOVER7.png", "GAMEOVER8.png", "GAMEOVER9.png", "GAMEOVER10.png", "GAMEOVER11.png", "GAMEOVER12.png", "GAMEOVER13.png", "GAMEOVER14.png", "GAMEOVER15.png", "GAMEOVER16.png", "GAMEOVER17.png", "GAMEOVER18.png", "GAMEOVER19.png", "GAMEOVER20.png", "GAMEOVER21.png", "GAMEOVER22.png", "GAMEOVER23.png", "GAMEOVER24.png"];
         var gameOverImgEl = document.getElementById("game-over-img");
         if (gameOverImgEl) {
           var idx = Math.floor(Math.random() * gameOverImgs.length);
