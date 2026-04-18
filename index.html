@@ -562,6 +562,16 @@
       bgmAudio.loop = true;
       bgmAudio.preload = "auto";
       bgmAudio.playsInline = true;
+      const charSelectSfx = new Audio("仕掛け作動2.mp3");
+      charSelectSfx.preload = "auto";
+      charSelectSfx.playsInline = true;
+      function playCharacterSelectSfx() {
+        try {
+          charSelectSfx.currentTime = 0;
+          const p = charSelectSfx.play();
+          if (p && typeof p.catch === "function") p.catch(function () { /* 無視 */ });
+        } catch (_e) { /* 無視 */ }
+      }
       // iOS Safari では <audio>.volume が実質効かないことが多いので、WebAudio の Gain で制御する
       const BGM_BASE_GAIN = 0.12;
       const isCoarsePointer = !!(window.matchMedia && window.matchMedia("(pointer: coarse)").matches);
@@ -697,98 +707,6 @@
         osc.connect(gain).connect(ctxA.destination);
         osc.start(now);
         osc.stop(now + 0.3);
-      }
-
-      /** タイトルでキャラ切り替え時：弾倉に弾を押し込む「カチャッ」 */
-      function playCharacterSelectWhoosh() {
-        const ctxA = getAudioCtx();
-        if (!ctxA) return;
-        if (ctxA.state === "suspended" && ctxA.resume) {
-          const r = ctxA.resume();
-          if (r && typeof r.catch === "function") r.catch(function () { /* 無視 */ });
-        }
-        const now = ctxA.currentTime;
-        const master = ctxA.createGain();
-        master.gain.setValueAtTime(0.78, now);
-        master.connect(ctxA.destination);
-
-        function noiseHit(t0, peak, fc, durSec, q) {
-          const nLen = Math.max(1, Math.floor(ctxA.sampleRate * durSec));
-          const nb = ctxA.createBuffer(1, nLen, ctxA.sampleRate);
-          const d = nb.getChannelData(0);
-          for (let i = 0; i < nLen; i++) d[i] = (Math.random() * 2 - 1) * 0.55;
-          const src = ctxA.createBufferSource();
-          src.buffer = nb;
-          const f = ctxA.createBiquadFilter();
-          f.type = "bandpass";
-          f.frequency.setValueAtTime(fc, t0);
-          f.Q.setValueAtTime(q, t0);
-          const g = ctxA.createGain();
-          g.gain.setValueAtTime(0.0001, t0);
-          g.gain.linearRampToValueAtTime(peak, t0 + 0.00065);
-          g.gain.exponentialRampToValueAtTime(0.0001, t0 + durSec * 0.88);
-          src.connect(f).connect(g).connect(master);
-          src.start(t0);
-          src.stop(t0 + durSec);
-        }
-
-        function metalPing(t0, f0, f1, peak, durMs) {
-          const osc = ctxA.createOscillator();
-          osc.type = "square";
-          const t1 = t0 + durMs * 0.001;
-          osc.frequency.setValueAtTime(f0, t0);
-          osc.frequency.exponentialRampToValueAtTime(Math.max(110, f1), t1);
-          const bp = ctxA.createBiquadFilter();
-          bp.type = "bandpass";
-          bp.frequency.setValueAtTime(f0 * 1.04, t0);
-          bp.Q.setValueAtTime(12, t0);
-          const g = ctxA.createGain();
-          g.gain.setValueAtTime(0.0001, t0);
-          g.gain.linearRampToValueAtTime(peak, t0 + 0.00045);
-          g.gain.exponentialRampToValueAtTime(0.0001, t1 + 0.008);
-          osc.connect(bp).connect(g).connect(master);
-          osc.start(t0);
-          osc.stop(t1 + 0.012);
-        }
-
-        function springThump(t0, peak) {
-          const osc = ctxA.createOscillator();
-          osc.type = "sine";
-          osc.frequency.setValueAtTime(168, t0);
-          osc.frequency.exponentialRampToValueAtTime(58, t0 + 0.048);
-          const g = ctxA.createGain();
-          g.gain.setValueAtTime(0.0001, t0);
-          g.gain.linearRampToValueAtTime(peak, t0 + 0.0018);
-          g.gain.exponentialRampToValueAtTime(0.0001, t0 + 0.052);
-          osc.connect(g).connect(master);
-          osc.start(t0);
-          osc.stop(t0 + 0.065);
-        }
-
-        function magBody(t0, peak) {
-          const osc = ctxA.createOscillator();
-          osc.type = "triangle";
-          osc.frequency.setValueAtTime(132, t0);
-          osc.frequency.exponentialRampToValueAtTime(88, t0 + 0.038);
-          const g = ctxA.createGain();
-          g.gain.setValueAtTime(0.0001, t0);
-          g.gain.linearRampToValueAtTime(peak, t0 + 0.0011);
-          g.gain.exponentialRampToValueAtTime(0.0001, t0 + 0.042);
-          osc.connect(g).connect(master);
-          osc.start(t0);
-          osc.stop(t0 + 0.05);
-        }
-
-        /* 「カ」弾頭が先に当たる */
-        noiseHit(now, 0.12, 5600, 0.012, 2.8);
-        metalPing(now, 3600, 1550, 0.055, 7);
-        /* 「チャ」マガジンがロック */
-        springThump(now + 0.026, 0.14);
-        magBody(now + 0.028, 0.11);
-        noiseHit(now + 0.028, 0.09, 3000, 0.024, 1.7);
-        metalPing(now + 0.026, 2250, 620, 0.045, 17);
-        /* 「ッ」小さな金属の締まり */
-        noiseHit(now + 0.066, 0.048, 6200, 0.009, 3.1);
       }
 
       function playIceCrackSound() {
@@ -1006,7 +924,7 @@
           if (!btn || charSwapBusy) return;
           var idx = parseInt(btn.getAttribute("data-char"), 10);
           if (idx !== 0 && idx !== 1) return;
-          playCharacterSelectWhoosh();
+          playCharacterSelectSfx();
           if (idx === selectedCharacterIndex) return;
           runCharacterSwap(idx);
         });
@@ -1461,14 +1379,18 @@
           var imgToDraw = ojisanImg;
           var imgLoaded = ojisanLoaded;
           var sizeScale = 1;
-          if (player.vy > 1.5 && player.vy < 6) {
-            imgToDraw = ojisanImg1;
-            imgLoaded = ojisanLoaded1;
-            sizeScale = 0.95;
-          } else if (player.vy >= 6) {
-            imgToDraw = ojisanImg2;
-            imgLoaded = ojisanLoaded2;
-            sizeScale = 0.7;
+          var curCh = PLAYABLE_CHARACTERS[selectedCharacterIndex];
+          var isIsshou = curCh && curCh.id === "gen";
+          if (!isIsshou) {
+            if (player.vy > 1.5 && player.vy < 6) {
+              imgToDraw = ojisanImg1;
+              imgLoaded = ojisanLoaded1;
+              sizeScale = 0.95;
+            } else if (player.vy >= 6) {
+              imgToDraw = ojisanImg2;
+              imgLoaded = ojisanLoaded2;
+              sizeScale = 0.7;
+            }
           }
           if (imgLoaded) {
             const imgW = imgToDraw.width;
