@@ -132,12 +132,219 @@
         filter: drop-shadow(0 0 4px #fff) drop-shadow(0 0 10px #ffb703) drop-shadow(0 0 25px #ff8800);
       }
     }
-    .title-character { width: 120px; height: 120px; margin: 0 auto 10px; display: flex; align-items: center; justify-content: center; }
-    .title-character img {
+    .char-select-root {
+      margin: 0 auto 14px;
+      width: 100%;
+      max-width: 320px;
+    }
+    .char-select-stage {
+      position: relative;
+      height: 168px;
+      perspective: 820px;
+      perspective-origin: 50% 42%;
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      gap: 0;
+      margin: 0 auto;
+      --char-swap-dur: 0.72s;
+    }
+    .char-slot {
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      width: 118px;
+      height: 138px;
+      margin-left: -59px;
+      padding: 0;
+      border: none;
+      background: transparent;
+      cursor: pointer;
+      border-radius: 16px;
+      transform-style: preserve-3d;
+      -webkit-tap-highlight-color: transparent;
+      outline: none;
+      transition: filter 0.25s ease;
+    }
+    .char-slot:focus-visible {
+      box-shadow: 0 0 0 2px rgba(196, 181, 253, 0.95), 0 0 18px rgba(139, 92, 246, 0.45);
+      border-radius: 18px;
+    }
+    .char-slot-inner {
+      position: relative;
+      width: 100%;
+      height: 118px;
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      pointer-events: none;
+    }
+    .char-slot img {
       max-width: 100%;
-      max-height: 100%;
+      max-height: 118px;
+      width: auto;
+      height: auto;
+      object-fit: contain;
       image-rendering: pixelated;
-      animation: chara-neon 1.5s infinite alternate;
+      display: block;
+      transform-origin: 50% 100%;
+      filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.45));
+    }
+    .char-slot-name {
+      display: block;
+      margin-top: 4px;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      color: #e0e7ff;
+      text-align: center;
+      text-shadow: 0 1px 8px rgba(0, 0, 0, 0.75);
+      pointer-events: none;
+    }
+    .char-slot-glow {
+      position: absolute;
+      inset: -6px -10px 18px -10px;
+      border-radius: 50%;
+      background: radial-gradient(ellipse at 50% 75%, rgba(251, 191, 36, 0.22), transparent 62%);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.35s ease;
+    }
+    /* 静止レイアウト: 選択が左 */
+    .char-select-stage[data-selected="0"] .char-slot[data-char="0"] {
+      transform: translate3d(-12px, -6px, 28px) scale(1.14) rotateY(0deg);
+      z-index: 4;
+      filter: brightness(1.05) saturate(1.08);
+    }
+    .char-select-stage[data-selected="0"] .char-slot[data-char="0"] .char-slot-glow {
+      opacity: 1;
+    }
+    .char-select-stage[data-selected="0"] .char-slot[data-char="0"] img {
+      animation: chara-neon 1.5s infinite alternate, char-float 2.8s ease-in-out infinite;
+    }
+    .char-select-stage[data-selected="0"] .char-slot[data-char="1"] {
+      transform: translate3d(108px, 14px, -38px) scale(0.66) rotateY(-14deg);
+      z-index: 1;
+      filter: brightness(0.5) saturate(0.75);
+      opacity: 0.88;
+    }
+    /* 静止レイアウト: 選択が右 */
+    .char-select-stage[data-selected="1"] .char-slot[data-char="1"] {
+      transform: translate3d(12px, -6px, 28px) scale(1.14) rotateY(0deg);
+      z-index: 4;
+      filter: brightness(1.05) saturate(1.08);
+    }
+    .char-select-stage[data-selected="1"] .char-slot[data-char="1"] .char-slot-glow {
+      opacity: 1;
+    }
+    .char-select-stage[data-selected="1"] .char-slot[data-char="1"] img {
+      animation: chara-neon 1.5s infinite alternate, char-float 2.8s ease-in-out 0.2s infinite;
+    }
+    .char-select-stage[data-selected="1"] .char-slot[data-char="0"] {
+      transform: translate3d(-108px, 14px, -38px) scale(0.66) rotateY(14deg);
+      z-index: 1;
+      filter: brightness(0.5) saturate(0.75);
+      opacity: 0.88;
+    }
+    .char-select-stage.is-animating .char-slot {
+      animation-duration: var(--char-swap-dur);
+      animation-timing-function: cubic-bezier(0.45, 0, 0.2, 1);
+      animation-fill-mode: both;
+    }
+    /* 0 → 1: 右の子が前へ（円弧）、中央が左へ */
+    .char-select-stage.is-animating[data-anim="0-1"] .char-slot[data-char="0"] {
+      animation-name: char-demote-to-left;
+    }
+    .char-select-stage.is-animating[data-anim="0-1"] .char-slot[data-char="1"] {
+      animation-name: char-promote-from-right;
+    }
+    /* 1 → 0 */
+    .char-select-stage.is-animating[data-anim="1-0"] .char-slot[data-char="0"] {
+      animation-name: char-promote-from-left;
+    }
+    .char-select-stage.is-animating[data-anim="1-0"] .char-slot[data-char="1"] {
+      animation-name: char-demote-to-right;
+    }
+    @keyframes char-float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-5px); }
+    }
+    @keyframes char-promote-from-right {
+      0% {
+        transform: translate3d(108px, 14px, -38px) scale(0.66) rotateY(-14deg);
+        filter: brightness(0.5) saturate(0.75);
+        opacity: 0.88;
+      }
+      52% {
+        transform: translate3d(18px, -36px, 8px) scale(0.98) rotateY(-4deg);
+        filter: brightness(0.88) saturate(0.95);
+        opacity: 1;
+      }
+      100% {
+        transform: translate3d(12px, -6px, 28px) scale(1.14) rotateY(0deg);
+        filter: brightness(1.05) saturate(1.08);
+        opacity: 1;
+      }
+    }
+    @keyframes char-demote-to-left {
+      0% {
+        transform: translate3d(-12px, -6px, 28px) scale(1.14) rotateY(0deg);
+        filter: brightness(1.05) saturate(1.08);
+        opacity: 1;
+      }
+      48% {
+        transform: translate3d(-72px, -28px, 2px) scale(0.88) rotateY(8deg);
+        filter: brightness(0.72) saturate(0.88);
+        opacity: 0.95;
+      }
+      100% {
+        transform: translate3d(-108px, 14px, -38px) scale(0.66) rotateY(14deg);
+        filter: brightness(0.5) saturate(0.75);
+        opacity: 0.88;
+      }
+    }
+    @keyframes char-promote-from-left {
+      0% {
+        transform: translate3d(-108px, 14px, -38px) scale(0.66) rotateY(14deg);
+        filter: brightness(0.5) saturate(0.75);
+        opacity: 0.88;
+      }
+      52% {
+        transform: translate3d(-18px, -36px, 8px) scale(0.98) rotateY(4deg);
+        filter: brightness(0.88) saturate(0.95);
+        opacity: 1;
+      }
+      100% {
+        transform: translate3d(-12px, -6px, 28px) scale(1.14) rotateY(0deg);
+        filter: brightness(1.05) saturate(1.08);
+        opacity: 1;
+      }
+    }
+    @keyframes char-demote-to-right {
+      0% {
+        transform: translate3d(12px, -6px, 28px) scale(1.14) rotateY(0deg);
+        filter: brightness(1.05) saturate(1.08);
+        opacity: 1;
+      }
+      48% {
+        transform: translate3d(72px, -28px, 2px) scale(0.88) rotateY(-8deg);
+        filter: brightness(0.72) saturate(0.88);
+        opacity: 0.95;
+      }
+      100% {
+        transform: translate3d(108px, 14px, -38px) scale(0.66) rotateY(-14deg);
+        filter: brightness(0.5) saturate(0.75);
+        opacity: 0.88;
+      }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .char-select-stage.is-animating .char-slot {
+        animation: none !important;
+      }
+      .char-select-stage[data-selected="0"] .char-slot[data-char="0"] img,
+      .char-select-stage[data-selected="1"] .char-slot[data-char="1"] img {
+        animation: none !important;
+      }
     }
     .game-over { composes: overlay; }
     .game-over-img {
@@ -264,8 +471,25 @@
         </a>
         <div class="start-card">
         <div class="start-title">🟣Purple Jumper🟣</div>
-        <div class="kamiki-ver">KAMIKI ver.</div>
-        <div class="title-character"><img src="透過済.png" alt="紫おじさん" /></div>
+        <div class="kamiki-ver">キャラクターを選ぶ</div>
+        <div class="char-select-root" id="char-select-root">
+          <div class="char-select-stage" id="char-select-stage" data-selected="0" role="group" aria-label="キャラクター選択">
+            <button type="button" class="char-slot" data-char="0" id="char-slot-0" aria-pressed="true" aria-label="KAMIKIを選択">
+              <span class="char-slot-glow" aria-hidden="true"></span>
+              <span class="char-slot-inner">
+                <img src="透過済.png" alt="" draggable="false" />
+              </span>
+              <span class="char-slot-name">KAMIKI</span>
+            </button>
+            <button type="button" class="char-slot" data-char="1" id="char-slot-1" aria-pressed="false" aria-label="イッショウを選択">
+              <span class="char-slot-glow" aria-hidden="true"></span>
+              <span class="char-slot-inner">
+                <img src="元透過済.png" alt="" draggable="false" />
+              </span>
+              <span class="char-slot-name">イッショウ</span>
+            </button>
+          </div>
+        </div>
         <div class="start-label">ニックネームを入力してください</div>
         <input id="nickname-input" class="start-input" type="text" maxlength="12" placeholder="例: むらさき太郎" />
         <button id="btn-start" class="primary-btn">ゲームスタート</button>
@@ -339,12 +563,12 @@
       bgmAudio.preload = "auto";
       bgmAudio.playsInline = true;
       // iOS Safari では <audio>.volume が実質効かないことが多いので、WebAudio の Gain で制御する
-      const BGM_BASE_GAIN = 0.08;
+      const BGM_BASE_GAIN = 0.12;
       const isCoarsePointer = !!(window.matchMedia && window.matchMedia("(pointer: coarse)").matches);
       const isTouchCapable = ("ontouchstart" in window) || (navigator.maxTouchPoints > 0);
       const isMobileUA = /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent || "");
       const isMobileLikeDevice = isCoarsePointer || (isTouchCapable && isMobileUA);
-      const BGM_MOBILE_GAIN_MULTIPLIER = 0.35;
+      const BGM_MOBILE_GAIN_MULTIPLIER = 0.5;
       function getBgmTargetGain() {
         return isMobileLikeDevice ? BGM_BASE_GAIN * BGM_MOBILE_GAIN_MULTIPLIER : BGM_BASE_GAIN;
       }
@@ -586,18 +810,116 @@
       const RED_JUMP_MULTIPLIER = Math.sqrt(5);
       const MOVING_PLATFORM_SPEED = 2.0; // 1.3倍にアップ
 
+      const PLAYABLE_CHARACTERS = [
+        { id: "purple", name: "KAMIKI", preview: "透過済.png", base: "透過済.png", jump1: "透過済1.png", jump2: "透過済2.png" },
+        { id: "gen", name: "イッショウ", preview: "元透過済.png", base: "元透過済.png", jump1: "元透過済.png", jump2: "元透過済.png" }
+      ];
+      const CHAR_STORAGE_KEY = "murasaki_ojisan_character";
       const ojisanImg = new Image();
-      ojisanImg.src = "透過済.png";
-      let ojisanLoaded = false;
-      ojisanImg.onload = () => { ojisanLoaded = true; };
       const ojisanImg1 = new Image();
-      ojisanImg1.src = "透過済1.png";
-      let ojisanLoaded1 = false;
-      ojisanImg1.onload = () => { ojisanLoaded1 = true; };
       const ojisanImg2 = new Image();
-      ojisanImg2.src = "透過済2.png";
+      let ojisanLoaded = false;
+      let ojisanLoaded1 = false;
       let ojisanLoaded2 = false;
-      ojisanImg2.onload = () => { ojisanLoaded2 = true; };
+      let selectedCharacterIndex = 0;
+
+      const charSelectStage = document.getElementById("char-select-stage");
+      const charSlot0 = document.getElementById("char-slot-0");
+      const charSlot1 = document.getElementById("char-slot-1");
+      let charSwapBusy = false;
+
+      function isSlotSwapAnimation(name) {
+        return name === "char-promote-from-right" || name === "char-demote-to-left" ||
+          name === "char-promote-from-left" || name === "char-demote-to-right";
+      }
+
+      function syncCharSelectDom() {
+        if (!charSelectStage) return;
+        charSelectStage.dataset.selected = String(selectedCharacterIndex);
+        if (charSlot0) charSlot0.setAttribute("aria-pressed", selectedCharacterIndex === 0 ? "true" : "false");
+        if (charSlot1) charSlot1.setAttribute("aria-pressed", selectedCharacterIndex === 1 ? "true" : "false");
+      }
+
+      function applyPlayableCharacter(index, opts) {
+        const o = opts || {};
+        const c = PLAYABLE_CHARACTERS[index];
+        if (!c) return;
+        selectedCharacterIndex = index;
+        if (!o.skipPersist) {
+          try { localStorage.setItem(CHAR_STORAGE_KEY, String(index)); } catch (_e) { /* 無視 */ }
+        }
+        ojisanLoaded = false;
+        ojisanLoaded1 = false;
+        ojisanLoaded2 = false;
+        const mark = function (which) {
+          if (which === 0) ojisanLoaded = true;
+          else if (which === 1) ojisanLoaded1 = true;
+          else if (which === 2) ojisanLoaded2 = true;
+        };
+        ojisanImg.onload = function () { mark(0); };
+        ojisanImg1.onload = function () { mark(1); };
+        ojisanImg2.onload = function () { mark(2); };
+        ojisanImg.src = c.base;
+        ojisanImg1.src = c.jump1;
+        ojisanImg2.src = c.jump2;
+        syncCharSelectDom();
+      }
+
+      function initCharacterFromStorage() {
+        var raw = null;
+        try { raw = localStorage.getItem(CHAR_STORAGE_KEY); } catch (_e) { raw = null; }
+        var idx = parseInt(raw, 10);
+        if (!(idx === 0 || idx === 1)) idx = 0;
+        applyPlayableCharacter(idx, { skipPersist: true });
+      }
+
+      function runCharacterSwap(toIndex) {
+        if (!charSelectStage || charSwapBusy) return;
+        if (toIndex !== 0 && toIndex !== 1) return;
+        if (toIndex === selectedCharacterIndex) return;
+        if (window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+          applyPlayableCharacter(toIndex);
+          return;
+        }
+        charSwapBusy = true;
+        var from = selectedCharacterIndex;
+        charSelectStage.dataset.anim = from + "-" + toIndex;
+        charSelectStage.classList.add("is-animating");
+        var left = 2;
+        var finished = false;
+        function completeSwap() {
+          if (finished) return;
+          finished = true;
+          clearTimeout(safetyTimer);
+          charSelectStage.removeEventListener("animationend", onStageAnimEnd);
+          charSelectStage.classList.remove("is-animating");
+          delete charSelectStage.dataset.anim;
+          applyPlayableCharacter(toIndex);
+          charSwapBusy = false;
+        }
+        function onStageAnimEnd(ev) {
+          if (ev.target !== charSlot0 && ev.target !== charSlot1) return;
+          if (!isSlotSwapAnimation(ev.animationName)) return;
+          left--;
+          if (left > 0) return;
+          completeSwap();
+        }
+        charSelectStage.addEventListener("animationend", onStageAnimEnd);
+        var safetyTimer = setTimeout(completeSwap, 900);
+      }
+
+      if (charSelectStage) {
+        charSelectStage.addEventListener("click", function (e) {
+          var btn = e.target.closest(".char-slot");
+          if (!btn || charSwapBusy) return;
+          var idx = parseInt(btn.getAttribute("data-char"), 10);
+          if (idx !== 0 && idx !== 1) return;
+          if (idx === selectedCharacterIndex) return;
+          runCharacterSwap(idx);
+        });
+      }
+
+      initCharacterFromStorage();
 
       const bgImg = new Image();
       bgImg.src = "背景.jpg";
@@ -1104,7 +1426,7 @@
         if (overEl) overEl.style.display = "flex";
         const gw = document.querySelector(".game-wrapper");
         if (gw) gw.classList.remove("game-playing");
-        var gameOverImgs = ["GAMEOVER.png", "GAMEOVER1.png", "GAMEOVER2.png", "GAMEOVER3.png", "GAMEOVER4.png", "GAMEOVER5.png", "GAMEOVER6.png", "GAMEOVER7.png", "GAMEOVER8.png", "GAMEOVER9.png", "GAMEOVER10.png", "GAMEOVER11.png", "GAMEOVER12.png", "GAMEOVER13.png", "GAMEOVER14.png", "GAMEOVER15.png", "GAMEOVER16.png", "GAMEOVER17.png", "GAMEOVER18.png", "GAMEOVER19.png", "GAMEOVER20.png", "GAMEOVER21.png", "GAMEOVER22.png", "GAMEOVER23.png", "GAMEOVER24.png", "GAMEOVER25.png"];
+        var gameOverImgs = ["GAMEOVER.png", "GAMEOVER1.png", "GAMEOVER2.png", "GAMEOVER3.png", "GAMEOVER4.png", "GAMEOVER5.png", "GAMEOVER6.png", "GAMEOVER7.png", "GAMEOVER8.png", "GAMEOVER9.png", "GAMEOVER10.png", "GAMEOVER11.png", "GAMEOVER12.png", "GAMEOVER13.png", "GAMEOVER14.png", "GAMEOVER15.png", "GAMEOVER16.png", "GAMEOVER17.png", "GAMEOVER18.png", "GAMEOVER19.png", "GAMEOVER20.png", "GAMEOVER21.png", "GAMEOVER22.png", "GAMEOVER23.png", "GAMEOVER24.png"];
         var gameOverImgEl = document.getElementById("game-over-img");
         if (gameOverImgEl) {
           var idx = Math.floor(Math.random() * gameOverImgs.length);
