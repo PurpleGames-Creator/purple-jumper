@@ -235,7 +235,7 @@
     .char-slot[data-char="0"] { --slot-x: 0px; --slot-rot: 0deg; }
     .char-slot[data-char="1"] { --slot-x: -118px; --slot-rot: 14deg; }
     .char-slot[data-char="2"] { --slot-x: 118px; --slot-rot: -14deg; }
-    .char-slot[data-char="3"] { --slot-x: 118px; --slot-rot: -14deg; top: -250px; }
+    .char-slot[data-char="3"] { --slot-x: 118px; --slot-rot: -14deg; top: -140px; }
     .char-select-stage[data-selected="0"] .char-slot[data-char="0"],
     .char-select-stage[data-selected="1"] .char-slot[data-char="1"],
     .char-select-stage[data-selected="2"] .char-slot[data-char="2"] {
@@ -276,120 +276,9 @@
       animation-fill-mode: both;
     }
     /* 0 → 1: 右の子が前へ（円弧）、中央が左へ */
-    .char-select-stage.is-animating[data-anim="0-1"] .char-slot[data-char="0"] {
-      animation-name: char-demote-to-left;
-    }
-    .char-select-stage.is-animating[data-anim="0-1"] .char-slot[data-char="1"] {
-      animation-name: char-promote-from-right;
-    }
-    /* 1 → 0 */
-    .char-select-stage.is-animating[data-anim="1-0"] .char-slot[data-char="0"] {
-      animation-name: char-promote-from-left;
-    }
-    .char-select-stage.is-animating[data-anim="1-0"] .char-slot[data-char="1"] {
-      animation-name: char-demote-to-right;
-    }
-    /* 1 → 2 */
-    .char-select-stage.is-animating[data-anim="1-2"] .char-slot[data-char="1"] {
-      animation-name: char-demote-to-left;
-    }
-    .char-select-stage.is-animating[data-anim="1-2"] .char-slot[data-char="2"] {
-      animation-name: char-promote-from-right;
-    }
-    /* 2 → 1 */
-    .char-select-stage.is-animating[data-anim="2-1"] .char-slot[data-char="1"] {
-      animation-name: char-promote-from-left;
-    }
-    .char-select-stage.is-animating[data-anim="2-1"] .char-slot[data-char="2"] {
-      animation-name: char-demote-to-right;
-    }
-    /* 2 → 3 */
-    .char-select-stage.is-animating[data-anim="2-3"] .char-slot[data-char="2"] {
-      animation-name: char-demote-to-left;
-    }
-    /* 3 → 2 */
-    .char-select-stage.is-animating[data-anim="3-2"] .char-slot[data-char="2"] {
-      animation-name: char-promote-from-left;
-    }
-    /* 3 → 0 */
-    .char-select-stage.is-animating[data-anim="3-0"] .char-slot[data-char="0"] {
-      animation-name: char-promote-from-right;
-    }
-    /* 0 → 3 */
-    .char-select-stage.is-animating[data-anim="0-3"] .char-slot[data-char="0"] {
-      animation-name: char-demote-to-right;
-    }
     @keyframes char-float {
       0%, 100% { transform: translateY(0); }
       50% { transform: translateY(-5px); }
-    }
-    @keyframes char-promote-from-right {
-      0% {
-        transform: translate3d(108px, 14px, -38px) scale(0.66) rotateY(-14deg);
-        filter: brightness(0.5) saturate(0.75);
-        opacity: 0.88;
-      }
-      52% {
-        transform: translate3d(18px, -36px, 8px) scale(0.98) rotateY(-4deg);
-        filter: brightness(0.88) saturate(0.95);
-        opacity: 1;
-      }
-      100% {
-        transform: translate3d(12px, -6px, 28px) scale(1.14) rotateY(0deg);
-        filter: brightness(1.05) saturate(1.08);
-        opacity: 1;
-      }
-    }
-    @keyframes char-demote-to-left {
-      0% {
-        transform: translate3d(-12px, -6px, 28px) scale(1.14) rotateY(0deg);
-        filter: brightness(1.05) saturate(1.08);
-        opacity: 1;
-      }
-      48% {
-        transform: translate3d(-72px, -28px, 2px) scale(0.88) rotateY(8deg);
-        filter: brightness(0.72) saturate(0.88);
-        opacity: 0.95;
-      }
-      100% {
-        transform: translate3d(-108px, 14px, -38px) scale(0.66) rotateY(14deg);
-        filter: brightness(0.5) saturate(0.75);
-        opacity: 0.88;
-      }
-    }
-    @keyframes char-promote-from-left {
-      0% {
-        transform: translate3d(-108px, 14px, -38px) scale(0.66) rotateY(14deg);
-        filter: brightness(0.5) saturate(0.75);
-        opacity: 0.88;
-      }
-      52% {
-        transform: translate3d(-18px, -36px, 8px) scale(0.98) rotateY(4deg);
-        filter: brightness(0.88) saturate(0.95);
-        opacity: 1;
-      }
-      100% {
-        transform: translate3d(-12px, -6px, 28px) scale(1.14) rotateY(0deg);
-        filter: brightness(1.05) saturate(1.08);
-        opacity: 1;
-      }
-    }
-    @keyframes char-demote-to-right {
-      0% {
-        transform: translate3d(12px, -6px, 28px) scale(1.14) rotateY(0deg);
-        filter: brightness(1.05) saturate(1.08);
-        opacity: 1;
-      }
-      48% {
-        transform: translate3d(72px, -28px, 2px) scale(0.88) rotateY(-8deg);
-        filter: brightness(0.72) saturate(0.88);
-        opacity: 0.95;
-      }
-      100% {
-        transform: translate3d(108px, 14px, -38px) scale(0.66) rotateY(-14deg);
-        filter: brightness(0.5) saturate(0.75);
-        opacity: 0.88;
-      }
     }
     @media (prefers-reduced-motion: reduce) {
       .char-select-stage.is-animating .char-slot {
