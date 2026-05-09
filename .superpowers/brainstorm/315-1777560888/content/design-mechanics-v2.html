@@ -1,0 +1,68 @@
+<h2>ゲームメカニクス設計 v2</h2>
+<p class="subtitle">スピード固定に変更しました。</p>
+
+<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+
+  <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; padding: 16px;">
+    <h3 style="margin-top:0;">🎮 基本ルール</h3>
+    <ul style="padding-left: 16px; line-height: 2;">
+      <li>グリッドサイズ：<strong>15×15</strong></li>
+      <li>スタート時の体長：<strong>3マス</strong></li>
+      <li>移動速度：<strong>300ms/マス（終始一定）</strong></li>
+      <li>🥩 肉を食べると体が<strong>1マス</strong>伸びる</li>
+      <li>壁 or 自分の体に当たると<strong>ゲームオーバー</strong></li>
+      <li>スコア = 食べた肉の<strong>枚数</strong></li>
+    </ul>
+  </div>
+
+  <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; padding: 16px;">
+    <h3 style="margin-top:0;">👆 操作方法</h3>
+    <ul style="padding-left: 16px; line-height: 2;">
+      <li>画面を<strong>スワイプ</strong>で方向転換</li>
+      <li>上下左右の4方向</li>
+      <li>逆方向への転換は<strong>無効</strong>（即死防止）</li>
+      <li>スワイプ判定距離：<strong>30px以上</strong></li>
+    </ul>
+    <div style="background: rgba(124,58,237,0.1); border: 1px solid rgba(124,58,237,0.3); border-radius:8px; padding:8px; margin-top:8px; font-size:12px; color:#a78bfa;">
+      📱 スマホ最適化：タッチイベント優先、誤タップ防止あり
+    </div>
+  </div>
+
+  <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; padding: 16px;">
+    <h3 style="margin-top:0;">🐂 キャラクター表示</h3>
+    <ul style="padding-left: 16px; line-height: 2;">
+      <li><strong>頭セル</strong>：用意してもらった牛の画像を表示</li>
+      <li>頭は進行方向に<strong>回転</strong>（上下左右で向き変化）</li>
+      <li><strong>体セル</strong>：紫グラデーションの3Dブロック</li>
+      <li>体は滑らかに<strong>アニメーション</strong>で伸びる</li>
+    </ul>
+  </div>
+
+  <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; padding: 16px;">
+    <h3 style="margin-top:0;">🏆 ランキング</h3>
+    <ul style="padding-left: 16px; line-height: 2;">
+      <li>Supabase に<strong>ニックネーム＋スコア</strong>を保存</li>
+      <li>今日 / 週間 / 歴代の<strong>3タブ</strong></li>
+      <li>各タブ上位<strong>10件</strong>表示</li>
+      <li>Purple Diverと<strong>同じDB構成</strong>で統一</li>
+    </ul>
+  </div>
+
+  <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; padding: 16px; grid-column: span 2;">
+    <h3 style="margin-top:0;">📁 ファイル構成（Purple Diverと同じ構造）</h3>
+    <div style="font-family: monospace; font-size: 12px; line-height: 2; color: #a78bfa;">
+      Purple Bull/<br>
+      &nbsp;&nbsp;├── index.html　　　　<span style="color:#6b7280;">← 画面HTML</span><br>
+      &nbsp;&nbsp;├── styles.css　　　　<span style="color:#6b7280;">← スタイル（3D含む）</span><br>
+      &nbsp;&nbsp;├── game.js　　　　　 <span style="color:#6b7280;">← ゲームロジック</span><br>
+      &nbsp;&nbsp;├── main.js　　　　　 <span style="color:#6b7280;">← 画面制御・スワイプ</span><br>
+      &nbsp;&nbsp;├── supabase-api.js　 <span style="color:#6b7280;">← ランキングAPI</span><br>
+      &nbsp;&nbsp;├── supabase-config.js <span style="color:#6b7280;">← DB接続設定</span><br>
+      &nbsp;&nbsp;├── bull.png　　　　　<span style="color:#6b7280;">← 牛キャラクター画像</span><br>
+      &nbsp;&nbsp;└── manifest.json　　 <span style="color:#6b7280;">← PWA対応</span>
+    </div>
+  </div>
+
+</div>
+
+<p class="subtitle" style="margin-top: 16px;">他に変更点はありますか？問題なければターミナルでOKと教えてください。</p>

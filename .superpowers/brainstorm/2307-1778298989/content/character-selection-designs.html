@@ -1,0 +1,113 @@
+<h2>キャラクター選択UIデザイン案</h2>
+<p class="subtitle">円形デザインでスワイプ操作に対応</p>
+
+<div class="cards">
+  <!-- 案A: 円形カルーセル（水平スワイプ） -->
+  <div class="card" data-choice="carousel" onclick="toggleSelect(this)">
+    <div class="card-image">
+      <div class="mockup">
+        <div class="mockup-header">案A: 円形カルーセル</div>
+        <div class="mockup-body" style="display:flex; flex-direction:column; align-items:center; gap:16px; padding:24px; background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); min-height:300px;">
+          <!-- 円形UI -->
+          <div style="position: relative; width: 280px; height: 200px; display: flex; align-items: center; justify-content: center;">
+            <!-- 左側の小さいキャラ -->
+            <div style="position: absolute; left: 20px; top: 50%; transform: translateY(-50%); text-align: center; opacity: 0.6;">
+              <div style="width: 60px; height: 80px; background: #ddd; border-radius: 8px; margin: 0 auto 8px; display: flex; align-items: center; justify-content: center; font-size: 40px;">🍤</div>
+              <div style="font-size: 12px; color: #e0e7ff;">イッショウ</div>
+            </div>
+
+            <!-- 中央の大きいキャラ（餃子） -->
+            <div style="position: absolute; text-align: center; z-index: 2;">
+              <div style="width: 100px; height: 120px; background: #ffd700; border-radius: 12px; margin: 0 auto 8px; display: flex; align-items: center; justify-content: center; font-size: 80px; box-shadow: 0 0 20px rgba(255, 215, 0, 0.4);">🥟</div>
+              <div style="font-size: 14px; font-weight: bold; color: #ffd700;">餃子</div>
+              <div style="font-size: 10px; color: #888; margin-top: 4px;">← スワイプ →</div>
+            </div>
+
+            <!-- 右側の小さいキャラ -->
+            <div style="position: absolute; right: 20px; top: 50%; transform: translateY(-50%); text-align: center; opacity: 0.6;">
+              <div style="width: 60px; height: 80px; background: #ddd; border-radius: 8px; margin: 0 auto 8px; display: flex; align-items: center; justify-content: center; font-size: 40px;">🟣</div>
+              <div style="font-size: 12px; color: #e0e7ff;">KAMIKI</div>
+            </div>
+          </div>
+          <div style="color: #aaa; font-size: 13px; margin-top: 12px;">水平スワイプで切り替え。シンプルで直感的</div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>円形カルーセル</h3>
+      <p>水平スワイプで左右に移動。奥行き効果で3D感を表現</p>
+    </div>
+  </div>
+
+  <!-- 案B: 円形ホイール（回転） -->
+  <div class="card" data-choice="wheel" onclick="toggleSelect(this)">
+    <div class="card-image">
+      <div class="mockup">
+        <div class="mockup-header">案B: 円形ホイール</div>
+        <div class="mockup-body" style="display:flex; flex-direction:column; align-items:center; gap:16px; padding:24px; background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); min-height:300px;">
+          <!-- 円形ホイール -->
+          <div style="position: relative; width: 240px; height: 240px; border-radius: 50%; border: 2px solid #4a4a6a; display: flex; align-items: center; justify-content: center; background: radial-gradient(circle, rgba(100,100,150,0.2) 0%, transparent 70%); transform: perspective(600px) rotateX(25deg);">
+
+            <!-- 上部 -->
+            <div style="position: absolute; top: 10px; text-align: center; opacity: 0.5;">
+              <div style="width: 50px; height: 60px; background: #ddd; border-radius: 6px; margin: 0 auto 6px; display: flex; align-items: center; justify-content: center; font-size: 36px;">🍜</div>
+              <div style="font-size: 10px; color: #e0e7ff;">パプ太郎</div>
+            </div>
+
+            <!-- 中央（選択） -->
+            <div style="position: absolute; text-align: center; z-index: 10;">
+              <div style="width: 90px; height: 110px; background: #ffd700; border-radius: 10px; margin: 0 auto 6px; display: flex; align-items: center; justify-content: center; font-size: 72px; box-shadow: 0 0 25px rgba(255, 215, 0, 0.5);">🥟</div>
+              <div style="font-size: 13px; font-weight: bold; color: #ffd700;">餃子</div>
+            </div>
+
+            <!-- 下部 -->
+            <div style="position: absolute; bottom: 10px; text-align: center; opacity: 0.5;">
+              <div style="width: 50px; height: 60px; background: #ddd; border-radius: 6px; margin: 0 auto 6px; display: flex; align-items: center; justify-content: center; font-size: 36px;">🤖</div>
+              <div style="font-size: 10px; color: #e0e7ff;">イッショウ</div>
+            </div>
+          </div>
+          <div style="color: #aaa; font-size: 13px; margin-top: 12px;">スワイプで円が回転。独特な没入感</div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>円形ホイール</h3>
+      <p>スワイプで円全体が回転。立体的で目立つデザイン</p>
+    </div>
+  </div>
+
+  <!-- 案C: 簡易円形（ドット選択） -->
+  <div class="card" data-choice="dots" onclick="toggleSelect(this)">
+    <div class="card-image">
+      <div class="mockup">
+        <div class="mockup-header">案C: ドット選択式</div>
+        <div class="mockup-body" style="display:flex; flex-direction:column; align-items:center; gap:16px; padding:24px; background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); min-height:300px;">
+          <!-- キャラ表示 -->
+          <div style="width: 120px; height: 150px; background: #ffd700; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 100px; box-shadow: 0 0 20px rgba(255, 215, 0, 0.4); margin-bottom: 8px;">🥟</div>
+
+          <!-- キャラ名 -->
+          <div style="font-size: 16px; font-weight: bold; color: #ffd700; margin-bottom: 16px;">餃子</div>
+
+          <!-- ドット選択 -->
+          <div style="display: flex; gap: 12px; margin-bottom: 12px;">
+            <div style="width: 8px; height: 8px; border-radius: 50%; background: #888;"></div>
+            <div style="width: 10px; height: 10px; border-radius: 50%; background: #ffd700; box-shadow: 0 0 8px #ffd700;"></div>
+            <div style="width: 8px; height: 8px; border-radius: 50%; background: #888;"></div>
+            <div style="width: 8px; height: 8px; border-radius: 50%; background: #888;"></div>
+          </div>
+
+          <div style="color: #aaa; font-size: 13px;">ドットをタップで選択。シンプルで軽量</div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>ドット選択式</h3>
+      <p>大きなキャラ表示 + 下部ドット。タップ操作で選択</p>
+    </div>
+  </div>
+</div>
+
+<div class="section" style="margin-top: 24px; padding: 16px; background: rgba(100,100,150,0.1); border-radius: 8px;">
+  <h3>質問</h3>
+  <p>どのデザインアプローチが理想に近いですか？またはこれらを組み合わせた形が理想ですか？</p>
+</div>

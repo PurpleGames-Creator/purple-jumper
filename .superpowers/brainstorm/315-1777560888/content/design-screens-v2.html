@@ -1,0 +1,153 @@
+<h2>設計モックアップ v2 — CSS 3D Transform版</h2>
+<p class="subtitle">斜め俯瞰（アイソメトリック風）の立体フィールドで Purple Bull を表現します</p>
+
+<div class="split" style="gap: 16px; align-items: flex-start;">
+
+  <!-- HOME SCREEN -->
+  <div class="mockup" style="flex:1;">
+    <div class="mockup-header">① ホーム画面</div>
+    <div class="mockup-body" style="background: linear-gradient(160deg, #1a0a2e 0%, #0d1f0d 100%); padding: 0; overflow:hidden; min-height: 440px; display:flex; flex-direction:column; align-items:center;">
+
+      <div style="width:100%; padding: 10px 12px; display:flex; justify-content:space-between; align-items:center; background:rgba(0,0,0,0.3); border-bottom: 1px solid rgba(124,58,237,0.3);">
+        <span style="color:#a78bfa; font-size:9px; letter-spacing:2px;">PURPLE PARK</span>
+        <span style="color:#6b7280; font-size:9px;">🔊</span>
+      </div>
+
+      <div style="margin: 18px 0 10px; text-align:center;">
+        <div style="font-size:20px; font-weight:900; background: linear-gradient(135deg, #a855f7, #ec4899, #f59e0b); -webkit-background-clip:text; -webkit-text-fill-color:transparent; letter-spacing:2px;">🐂 PURPLE BULL</div>
+        <div style="color:#6b7280; font-size:8px; letter-spacing:3px; margin-top:3px;">EAT MEAT · GROW LONGER</div>
+      </div>
+
+      <!-- 3D preview field (mini) -->
+      <div style="perspective: 200px; margin-bottom: 14px;">
+        <div style="transform: rotateX(40deg) rotateZ(-15deg); transform-style: preserve-3d; display: grid; grid-template-columns: repeat(6,20px); grid-template-rows: repeat(4,20px); gap: 2px;">
+          <!-- row 1 -->
+          <div style="background:linear-gradient(135deg,#166534,#15803d); border-radius:3px; box-shadow:0 3px 0 #052e16;"></div>
+          <div style="background:linear-gradient(135deg,#15803d,#166534); border-radius:3px; box-shadow:0 3px 0 #052e16;"></div>
+          <div style="background:linear-gradient(135deg,#166534,#15803d); border-radius:3px; box-shadow:0 3px 0 #052e16;"></div>
+          <div style="background:linear-gradient(135deg,#15803d,#166534); border-radius:3px; box-shadow:0 3px 0 #052e16;"></div>
+          <div style="background: radial-gradient(circle,#ef4444,#dc2626); border-radius:3px; box-shadow:0 3px 0 #7f1d1d, 0 0 8px rgba(239,68,68,0.6); display:flex;align-items:center;justify-content:center;font-size:9px;">🥩</div>
+          <div style="background:linear-gradient(135deg,#166534,#15803d); border-radius:3px; box-shadow:0 3px 0 #052e16;"></div>
+          <!-- row 2 -->
+          <div style="background:linear-gradient(135deg,#15803d,#166534); border-radius:3px; box-shadow:0 3px 0 #052e16;"></div>
+          <div style="background:linear-gradient(135deg,#a855f7,#7c3aed); border-radius:3px; box-shadow:0 4px 0 #4c1d95, 0 0 10px rgba(168,85,247,0.5), inset 0 1px 0 rgba(255,255,255,0.3);"></div>
+          <div style="background:linear-gradient(135deg,#a855f7,#7c3aed); border-radius:3px; box-shadow:0 4px 0 #4c1d95, 0 0 10px rgba(168,85,247,0.5), inset 0 1px 0 rgba(255,255,255,0.3);"></div>
+          <div style="background:linear-gradient(135deg,#c084fc,#9333ea); border-radius:50%; box-shadow:0 4px 0 #4c1d95, 0 0 14px rgba(192,132,252,0.7), inset 0 1px 0 rgba(255,255,255,0.4); display:flex;align-items:center;justify-content:center;font-size:7px;">👀</div>
+          <div style="background:linear-gradient(135deg,#166534,#15803d); border-radius:3px; box-shadow:0 3px 0 #052e16;"></div>
+          <div style="background:linear-gradient(135deg,#15803d,#166534); border-radius:3px; box-shadow:0 3px 0 #052e16;"></div>
+          <!-- row 3 -->
+          <div style="background:linear-gradient(135deg,#166534,#15803d); border-radius:3px; box-shadow:0 3px 0 #052e16;"></div>
+          <div style="background:linear-gradient(135deg,#15803d,#166534); border-radius:3px; box-shadow:0 3px 0 #052e16;"></div>
+          <div style="background:linear-gradient(135deg,#166534,#15803d); border-radius:3px; box-shadow:0 3px 0 #052e16;"></div>
+          <div style="background:linear-gradient(135deg,#15803d,#166534); border-radius:3px; box-shadow:0 3px 0 #052e16;"></div>
+          <div style="background:linear-gradient(135deg,#166534,#15803d); border-radius:3px; box-shadow:0 3px 0 #052e16;"></div>
+          <div style="background:linear-gradient(135deg,#15803d,#166534); border-radius:3px; box-shadow:0 3px 0 #052e16;"></div>
+        </div>
+      </div>
+
+      <div style="width:80%; background:rgba(255,255,255,0.05); border:1px solid rgba(124,58,237,0.4); border-radius:8px; padding:7px 12px; color:#d1d5db; font-size:10px; margin-bottom:10px; text-align:center;">むらさき太郎</div>
+      <div style="width:80%; background: linear-gradient(135deg, #7c3aed, #9333ea); border-radius:8px; padding: 9px; text-align:center; color:white; font-size:11px; font-weight:bold; box-shadow: 0 4px 0 #4c1d95, 0 6px 20px rgba(124,58,237,0.4); letter-spacing:2px; margin-bottom: 14px;">▶ GAME START</div>
+
+      <div style="width:85%; background:rgba(0,0,0,0.3); border-radius:10px; border:1px solid rgba(255,255,255,0.05); padding:8px;">
+        <div style="display:flex; gap:4px; margin-bottom:8px;">
+          <div style="flex:1; background:#7c3aed; border-radius:5px; padding:3px; text-align:center; font-size:8px; color:white;">今日</div>
+          <div style="flex:1; background:rgba(255,255,255,0.05); border-radius:5px; padding:3px; text-align:center; font-size:8px; color:#6b7280;">週間</div>
+          <div style="flex:1; background:rgba(255,255,255,0.05); border-radius:5px; padding:3px; text-align:center; font-size:8px; color:#6b7280;">歴代</div>
+        </div>
+        <div style="color:#a78bfa; font-size:8px;">🥇 むらさき太郎　　42</div>
+        <div style="color:#9ca3af; font-size:8px; margin-top:3px;">🥈 ぶるたろう　　　38</div>
+        <div style="color:#9ca3af; font-size:8px; margin-top:3px;">🥉 むーちゃん　　　31</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- GAME SCREEN -->
+  <div class="mockup" style="flex:1;">
+    <div class="mockup-header">② ゲーム画面（3Dフィールド）</div>
+    <div class="mockup-body" style="background: linear-gradient(160deg,#0a0015,#051205); padding:0; overflow:hidden; min-height:440px; display:flex; flex-direction:column;">
+
+      <div style="padding:8px 12px; background:rgba(0,0,0,0.4); border-bottom:1px solid rgba(124,58,237,0.2); display:flex; justify-content:space-between; align-items:center;">
+        <div style="color:#f59e0b; font-size:10px; font-weight:bold;">🥩 <span style="color:white;">12</span></div>
+        <div style="color:#a78bfa; font-size:9px; letter-spacing:1px;">BEST: 38</div>
+        <div style="color:#6b7280; font-size:9px;">❌</div>
+      </div>
+
+      <!-- 3D game field -->
+      <div style="flex:1; display:flex; align-items:center; justify-content:center; padding:10px;">
+        <div style="perspective: 400px; width:100%;">
+          <div style="transform: rotateX(35deg) rotateZ(-10deg); transform-style: preserve-3d; display: grid; grid-template-columns: repeat(10,1fr); gap: 2px; width:100%; padding:4px; background:rgba(0,0,0,0.3); border-radius:8px; box-shadow: 0 20px 60px rgba(0,0,0,0.8);">
+            <!-- 10x8 grid -->
+            <div style="background:linear-gradient(135deg,#166534,#15803d);aspect-ratio:1;border-radius:3px;box-shadow:0 3px 0 #052e16;"></div>
+            <div style="background:linear-gradient(135deg,#15803d,#1a4731);aspect-ratio:1;border-radius:3px;box-shadow:0 3px 0 #052e16;"></div>
+            <div style="background:linear-gradient(135deg,#166534,#15803d);aspect-ratio:1;border-radius:3px;box-shadow:0 3px 0 #052e16;"></div>
+            <div style="background: radial-gradient(circle,#ef4444,#dc2626);aspect-ratio:1;border-radius:4px;box-shadow:0 4px 0 #7f1d1d,0 0 10px rgba(239,68,68,0.7);display:flex;align-items:center;justify-content:center;font-size:8px;">🥩</div>
+            <div style="background:linear-gradient(135deg,#15803d,#166534);aspect-ratio:1;border-radius:3px;box-shadow:0 3px 0 #052e16;"></div>
+            <div style="background:linear-gradient(135deg,#166534,#15803d);aspect-ratio:1;border-radius:3px;box-shadow:0 3px 0 #052e16;"></div>
+            <div style="background:linear-gradient(135deg,#15803d,#1a4731);aspect-ratio:1;border-radius:3px;box-shadow:0 3px 0 #052e16;"></div>
+            <div style="background:linear-gradient(135deg,#166534,#15803d);aspect-ratio:1;border-radius:3px;box-shadow:0 3px 0 #052e16;"></div>
+            <div style="background:linear-gradient(135deg,#15803d,#166534);aspect-ratio:1;border-radius:3px;box-shadow:0 3px 0 #052e16;"></div>
+            <div style="background:linear-gradient(135deg,#166534,#15803d);aspect-ratio:1;border-radius:3px;box-shadow:0 3px 0 #052e16;"></div>
+
+            <div style="background:linear-gradient(135deg,#15803d,#166534);aspect-ratio:1;border-radius:3px;box-shadow:0 3px 0 #052e16;"></div>
+            <div style="background:linear-gradient(135deg,#166534,#15803d);aspect-ratio:1;border-radius:3px;box-shadow:0 3px 0 #052e16;"></div>
+            <div style="background:linear-gradient(135deg,#15803d,#1a4731);aspect-ratio:1;border-radius:3px;box-shadow:0 3px 0 #052e16;"></div>
+            <div style="background:linear-gradient(135deg,#166534,#15803d);aspect-ratio:1;border-radius:3px;box-shadow:0 3px 0 #052e16;"></div>
+            <div style="background:linear-gradient(135deg,#a855f7,#7c3aed);aspect-ratio:1;border-radius:4px;box-shadow:0 5px 0 #4c1d95,0 0 12px rgba(168,85,247,0.6),inset 0 1px 0 rgba(255,255,255,0.3);"></div>
+            <div style="background:linear-gradient(135deg,#a855f7,#7c3aed);aspect-ratio:1;border-radius:4px;box-shadow:0 5px 0 #4c1d95,0 0 12px rgba(168,85,247,0.6),inset 0 1px 0 rgba(255,255,255,0.3);"></div>
+            <div style="background:linear-gradient(135deg,#a855f7,#7c3aed);aspect-ratio:1;border-radius:4px;box-shadow:0 5px 0 #4c1d95,0 0 12px rgba(168,85,247,0.6),inset 0 1px 0 rgba(255,255,255,0.3);"></div>
+            <div style="background:linear-gradient(135deg,#c084fc,#9333ea);aspect-ratio:1;border-radius:50%;box-shadow:0 5px 0 #4c1d95,0 0 16px rgba(192,132,252,0.8),inset 0 1px 0 rgba(255,255,255,0.4);display:flex;align-items:center;justify-content:center;font-size:6px;">👀</div>
+            <div style="background:linear-gradient(135deg,#15803d,#166534);aspect-ratio:1;border-radius:3px;box-shadow:0 3px 0 #052e16;"></div>
+            <div style="background:linear-gradient(135deg,#166534,#15803d);aspect-ratio:1;border-radius:3px;box-shadow:0 3px 0 #052e16;"></div>
+
+            <div style="background:linear-gradient(135deg,#166534,#15803d);aspect-ratio:1;border-radius:3px;box-shadow:0 3px 0 #052e16;"></div>
+            <div style="background:linear-gradient(135deg,#15803d,#1a4731);aspect-ratio:1;border-radius:3px;box-shadow:0 3px 0 #052e16;"></div>
+            <div style="background:linear-gradient(135deg,#166534,#15803d);aspect-ratio:1;border-radius:3px;box-shadow:0 3px 0 #052e16;"></div>
+            <div style="background:linear-gradient(135deg,#15803d,#166534);aspect-ratio:1;border-radius:3px;box-shadow:0 3px 0 #052e16;"></div>
+            <div style="background:linear-gradient(135deg,#166534,#15803d);aspect-ratio:1;border-radius:3px;box-shadow:0 3px 0 #052e16;"></div>
+            <div style="background:linear-gradient(135deg,#15803d,#1a4731);aspect-ratio:1;border-radius:3px;box-shadow:0 3px 0 #052e16;"></div>
+            <div style="background:linear-gradient(135deg,#166534,#15803d);aspect-ratio:1;border-radius:3px;box-shadow:0 3px 0 #052e16;"></div>
+            <div style="background:linear-gradient(135deg,#15803d,#166534);aspect-ratio:1;border-radius:3px;box-shadow:0 3px 0 #052e16;"></div>
+            <div style="background:linear-gradient(135deg,#166534,#15803d);aspect-ratio:1;border-radius:3px;box-shadow:0 3px 0 #052e16;"></div>
+            <div style="background:linear-gradient(135deg,#15803d,#1a4731);aspect-ratio:1;border-radius:3px;box-shadow:0 3px 0 #052e16;"></div>
+
+            <div style="background:linear-gradient(135deg,#15803d,#166534);aspect-ratio:1;border-radius:3px;box-shadow:0 3px 0 #052e16;"></div>
+            <div style="background:linear-gradient(135deg,#166534,#15803d);aspect-ratio:1;border-radius:3px;box-shadow:0 3px 0 #052e16;"></div>
+            <div style="background:linear-gradient(135deg,#15803d,#1a4731);aspect-ratio:1;border-radius:3px;box-shadow:0 3px 0 #052e16;"></div>
+            <div style="background:linear-gradient(135deg,#166534,#15803d);aspect-ratio:1;border-radius:3px;box-shadow:0 3px 0 #052e16;"></div>
+            <div style="background:linear-gradient(135deg,#15803d,#166534);aspect-ratio:1;border-radius:3px;box-shadow:0 3px 0 #052e16;"></div>
+            <div style="background:linear-gradient(135deg,#166534,#15803d);aspect-ratio:1;border-radius:3px;box-shadow:0 3px 0 #052e16;"></div>
+            <div style="background:linear-gradient(135deg,#15803d,#1a4731);aspect-ratio:1;border-radius:3px;box-shadow:0 3px 0 #052e16;"></div>
+            <div style="background:linear-gradient(135deg,#166534,#15803d);aspect-ratio:1;border-radius:3px;box-shadow:0 3px 0 #052e16;"></div>
+            <div style="background:linear-gradient(135deg,#15803d,#166534);aspect-ratio:1;border-radius:3px;box-shadow:0 3px 0 #052e16;"></div>
+            <div style="background:linear-gradient(135deg,#166534,#15803d);aspect-ratio:1;border-radius:3px;box-shadow:0 3px 0 #052e16;"></div>
+          </div>
+        </div>
+      </div>
+
+      <div style="padding:6px; text-align:center; color:#374151; font-size:8px; letter-spacing:1px;">← SWIPE TO MOVE →</div>
+    </div>
+  </div>
+
+  <!-- GAMEOVER -->
+  <div class="mockup" style="flex:1;">
+    <div class="mockup-header">③ ゲームオーバー</div>
+    <div class="mockup-body" style="background:rgba(0,0,0,0.85); padding:0; overflow:hidden; min-height:440px; display:flex; align-items:center; justify-content:center;">
+      <div style="background: linear-gradient(160deg,#1e1b4b,#0d1f0d); border:1px solid rgba(124,58,237,0.4); border-radius:16px; padding:20px; width:85%; text-align:center; box-shadow: 0 20px 60px rgba(0,0,0,0.8), inset 0 1px 0 rgba(255,255,255,0.1);">
+        <div style="font-size:20px; margin-bottom:4px;">💀</div>
+        <div style="color:white; font-size:14px; font-weight:900; letter-spacing:3px; margin-bottom:12px;">GAME OVER</div>
+        <div style="background:rgba(255,255,255,0.05); border-radius:8px; padding:10px; margin-bottom:10px;">
+          <div style="color:#9ca3af; font-size:8px; margin-bottom:4px;">今回の記録</div>
+          <div style="color:#f59e0b; font-size:22px; font-weight:900;">🥩 24</div>
+          <div style="color:#a78bfa; font-size:9px; margin-top:4px; padding:3px 8px; background:rgba(124,58,237,0.2); border-radius:20px; display:inline-block;">🎉 New Record!</div>
+        </div>
+        <div style="display:flex; gap:8px;">
+          <div style="flex:1; background:linear-gradient(135deg,#7c3aed,#9333ea); border-radius:8px; padding:8px; color:white; font-size:9px; font-weight:bold; box-shadow:0 3px 0 #4c1d95;">再挑戦</div>
+          <div style="flex:1; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); border-radius:8px; padding:8px; color:#9ca3af; font-size:9px;">トップへ</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<p class="subtitle" style="margin-top:12px;">ゲームフィールドが斜め俯瞰の3D表示になっています。この方向性でよいですか？ターミナルで教えてください。</p>

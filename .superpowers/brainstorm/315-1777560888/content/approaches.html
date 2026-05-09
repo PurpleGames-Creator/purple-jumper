@@ -1,0 +1,81 @@
+<h2>実装アプローチを選んでください</h2>
+<p class="subtitle">Purple Bull のレンダリング方式 — 見た目のリッチさと実装コストのバランスで選びます</p>
+
+<div class="cards">
+
+  <div class="card" data-choice="a" onclick="toggleSelect(this)">
+    <div class="card-image" style="background: linear-gradient(135deg, #1a472a 0%, #2d6a4f 50%, #1a472a 100%); padding: 20px; font-family: monospace;">
+      <div style="display: grid; grid-template-columns: repeat(5,1fr); gap: 3px; max-width: 160px; margin: 0 auto;">
+        <div style="background: rgba(255,255,255,0.05); border-radius:4px; aspect-ratio:1; box-shadow: inset 0 -2px 0 rgba(0,0,0,0.3), 0 1px 0 rgba(255,255,255,0.1);"></div>
+        <div style="background: rgba(255,255,255,0.05); border-radius:4px; aspect-ratio:1; box-shadow: inset 0 -2px 0 rgba(0,0,0,0.3), 0 1px 0 rgba(255,255,255,0.1);"></div>
+        <div style="background:rgba(255,255,255,0.05); border-radius:4px; aspect-ratio:1; box-shadow: inset 0 -2px 0 rgba(0,0,0,0.3);"></div>
+        <div style="background: #7c3aed; border-radius:4px; aspect-ratio:1; box-shadow: 0 4px 0 #4c1d95, inset 0 1px 0 rgba(255,255,255,0.3);"></div>
+        <div style="background: #7c3aed; border-radius:4px; aspect-ratio:1; box-shadow: 0 4px 0 #4c1d95, inset 0 1px 0 rgba(255,255,255,0.3);"></div>
+        <div style="background:rgba(255,255,255,0.05); border-radius:4px; aspect-ratio:1;"></div>
+        <div style="background: #7c3aed; border-radius:4px; aspect-ratio:1; box-shadow: 0 4px 0 #4c1d95, inset 0 1px 0 rgba(255,255,255,0.3);"></div>
+        <div style="background: #7c3aed; border-radius:4px; aspect-ratio:1; box-shadow: 0 4px 0 #4c1d95, inset 0 1px 0 rgba(255,255,255,0.3);"></div>
+        <div style="background: #8b5cf6; border-radius:50%; aspect-ratio:1; box-shadow: 0 4px 0 #4c1d95, inset 0 1px 0 rgba(255,255,255,0.4); display:flex; align-items:center; justify-content:center; font-size:10px;">👀</div>
+        <div style="background:rgba(255,255,255,0.05); border-radius:4px; aspect-ratio:1;"></div>
+        <div style="background: #dc2626; border-radius: 50%; width: 18px; height: 18px; box-shadow: 0 3px 0 #991b1b, inset 0 1px 0 rgba(255,255,255,0.3); margin: auto; font-size:10px; display:flex; align-items:center; justify-content:center;">🥩</div>
+      </div>
+      <p style="color:rgba(255,255,255,0.5); font-size:10px; text-align:center; margin-top:8px;">Canvas 2D — グラデーション＋影で立体感</p>
+    </div>
+    <div class="card-body">
+      <h3>A. Canvas 2D リッチ描画</h3>
+      <p>HTML5 Canvas にグラデーション・影・ハイライトで立体感を出す。Purple Diverと同じ技術スタック。動作が軽快でスマホに最適。</p>
+      <p style="color: #a78bfa; font-weight: bold;">✅ おすすめ — 実績あり・軽量・十分リッチ</p>
+    </div>
+  </div>
+
+  <div class="card" data-choice="b" onclick="toggleSelect(this)">
+    <div class="card-image" style="background: #0f172a; padding: 20px;">
+      <div style="perspective: 300px; max-width: 160px; margin: 0 auto;">
+        <div style="transform: rotateX(25deg); display: grid; grid-template-columns: repeat(5,1fr); gap: 3px; transform-style: preserve-3d;">
+          <div style="background: #166534; border-radius:3px; aspect-ratio:1; box-shadow: 0 2px 4px rgba(0,0,0,0.5);"></div>
+          <div style="background: #15803d; border-radius:3px; aspect-ratio:1; box-shadow: 0 2px 4px rgba(0,0,0,0.5);"></div>
+          <div style="background: #166534; border-radius:3px; aspect-ratio:1;"></div>
+          <div style="background: #7c3aed; border-radius:3px; aspect-ratio:1; box-shadow: 0 0 8px #a855f7, 0 2px 0 #4c1d95;"></div>
+          <div style="background: #7c3aed; border-radius:3px; aspect-ratio:1; box-shadow: 0 0 8px #a855f7;"></div>
+          <div style="background: #15803d; border-radius:3px; aspect-ratio:1;"></div>
+          <div style="background: #7c3aed; border-radius:3px; aspect-ratio:1; box-shadow: 0 0 8px #a855f7;"></div>
+          <div style="background: #7c3aed; border-radius:3px; aspect-ratio:1; box-shadow: 0 0 8px #a855f7;"></div>
+          <div style="background: #8b5cf6; border-radius:50%; aspect-ratio:1; box-shadow: 0 0 12px #c084fc; font-size:10px; display:flex; align-items:center; justify-content:center;">👀</div>
+          <div style="background: #166534; border-radius:3px; aspect-ratio:1;"></div>
+        </div>
+      </div>
+      <p style="color:rgba(255,255,255,0.5); font-size:10px; text-align:center; margin-top:8px;">CSS 3D Transform — 斜め俯瞰視点</p>
+    </div>
+    <div class="card-body">
+      <h3>B. CSS DOM + 3D Transform</h3>
+      <p>各マスをDOMで管理し、CSS perspective で斜め俯瞰（アイソメトリック風）を実現。見た目のインパクトは最大。</p>
+      <p style="color: #f59e0b;">⚠️ スマホ描画コストが高め・実装複雑</p>
+    </div>
+  </div>
+
+  <div class="card" data-choice="c" onclick="toggleSelect(this)">
+    <div class="card-image" style="background: linear-gradient(135deg, #1a472a, #052e16); padding: 20px; position:relative; overflow:hidden;">
+      <div style="position:absolute; inset:0; background: radial-gradient(ellipse at 50% 30%, rgba(124,58,237,0.2) 0%, transparent 70%);"></div>
+      <div style="display: grid; grid-template-columns: repeat(5,1fr); gap: 2px; max-width: 160px; margin: 0 auto; position:relative;">
+        <div style="background: linear-gradient(135deg,#166534,#15803d); border-radius:4px; aspect-ratio:1; border: 1px solid rgba(255,255,255,0.05);"></div>
+        <div style="background: linear-gradient(135deg,#15803d,#166534); border-radius:4px; aspect-ratio:1; border: 1px solid rgba(255,255,255,0.05);"></div>
+        <div style="background: linear-gradient(135deg,#166534,#15803d); border-radius:4px; aspect-ratio:1;"></div>
+        <div style="background: linear-gradient(135deg, #a855f7, #7c3aed); border-radius:6px; aspect-ratio:1; box-shadow: 0 4px 12px rgba(168,85,247,0.6), inset 0 1px 0 rgba(255,255,255,0.3);"></div>
+        <div style="background: linear-gradient(135deg, #a855f7, #7c3aed); border-radius:6px; aspect-ratio:1; box-shadow: 0 4px 12px rgba(168,85,247,0.6), inset 0 1px 0 rgba(255,255,255,0.3);"></div>
+        <div style="background: linear-gradient(135deg,#15803d,#166534); border-radius:4px; aspect-ratio:1;"></div>
+        <div style="background: linear-gradient(135deg, #a855f7, #7c3aed); border-radius:6px; aspect-ratio:1; box-shadow: 0 4px 12px rgba(168,85,247,0.6);"></div>
+        <div style="background: linear-gradient(135deg, #a855f7, #7c3aed); border-radius:6px; aspect-ratio:1; box-shadow: 0 4px 12px rgba(168,85,247,0.6);"></div>
+        <div style="background: linear-gradient(135deg, #c084fc, #9333ea); border-radius:50%; aspect-ratio:1; box-shadow: 0 4px 16px rgba(192,132,252,0.8), inset 0 1px 0 rgba(255,255,255,0.4); font-size:10px; display:flex; align-items:center; justify-content:center;">👀</div>
+        <div style="background: linear-gradient(135deg,#166534,#15803d); border-radius:4px; aspect-ratio:1;"></div>
+      </div>
+      <p style="color:rgba(255,255,255,0.5); font-size:10px; text-align:center; margin-top:8px;">Canvas 2D ハイクオリティ — グロー＆グラデーション全振り</p>
+    </div>
+    <div class="card-body">
+      <h3>C. Canvas 2D ハイビジュアル</h3>
+      <p>Aと同じCanvas技術だが、グロー発光・グラデーション・パーティクルエフェクトをフル活用した最高品質版。Aより重いが最もリッチ。</p>
+      <p style="color: #34d399;">✨ 最高の見た目 — やや実装工数大</p>
+    </div>
+  </div>
+
+</div>
+
+<p class="subtitle" style="margin-top: 16px;">クリックで選択 → ターミナルで教えてください</p>
