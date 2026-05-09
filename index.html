@@ -574,21 +574,11 @@
         } catch (_e) { /* 無視 */ }
       }
       function playCharacterSelectSfx() {
-        console.log("🔊 playCharacterSelectSfx called");
         try {
-          // ユーザージェスチャー内でAudioContextを再開
-          const ctxA = getAudioCtx();
-          if (ctxA && ctxA.state === "suspended") {
-            ctxA.resume();
-          }
-          // 音声を再生（毎回新しいAudio要素を作成）
-          const audioToPlay = new Audio("仕掛け作動2.mp3");
-          audioToPlay.volume = 0.6;
-          const p = audioToPlay.play();
-          p.then(() => console.log("✅ 音声再生成功")).catch(err => console.log("❌ 再生エラー:", err.message));
-        } catch (_e) {
-          console.log("❌ 例外:", _e.message);
-        }
+          const audio = new Audio("仕掛け作動2.mp3");
+          audio.volume = 0.6;
+          audio.play().catch(function () { /* ブラウザのオーディオポリシーで拒否される場合がある */ });
+        } catch (e) { /* 無視 */ }
       }
       // iOS Safari では <audio>.volume が実質効かないことが多いので、WebAudio の Gain で制御する
       const BGM_BASE_GAIN = 0.12;
