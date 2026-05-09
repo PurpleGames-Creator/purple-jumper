@@ -235,7 +235,7 @@
     .char-slot[data-char="0"] { --slot-x: 0px; --slot-rot: 0deg; }
     .char-slot[data-char="1"] { --slot-x: -118px; --slot-rot: 14deg; }
     .char-slot[data-char="2"] { --slot-x: 118px; --slot-rot: -14deg; }
-    .char-slot[data-char="3"] { --slot-x: 118px; --slot-rot: -14deg; }
+    .char-slot[data-char="3"] { --slot-x: 0px; --slot-rot: 0deg; }
     .char-select-stage[data-selected="0"] .char-slot[data-char="0"],
     .char-select-stage[data-selected="1"] .char-slot[data-char="1"],
     .char-select-stage[data-selected="2"] .char-slot[data-char="2"],
@@ -285,6 +285,48 @@
     }
     .char-select-stage.is-animating[data-anim="1-0"] .char-slot[data-char="1"] {
       animation-name: char-demote-to-right;
+    }
+    /* 1 → 2 */
+    .char-select-stage.is-animating[data-anim="1-2"] .char-slot[data-char="1"] {
+      animation-name: char-demote-to-left;
+    }
+    .char-select-stage.is-animating[data-anim="1-2"] .char-slot[data-char="2"] {
+      animation-name: char-promote-from-right;
+    }
+    /* 2 → 1 */
+    .char-select-stage.is-animating[data-anim="2-1"] .char-slot[data-char="1"] {
+      animation-name: char-promote-from-left;
+    }
+    .char-select-stage.is-animating[data-anim="2-1"] .char-slot[data-char="2"] {
+      animation-name: char-demote-to-right;
+    }
+    /* 2 → 3 */
+    .char-select-stage.is-animating[data-anim="2-3"] .char-slot[data-char="2"] {
+      animation-name: char-demote-to-left;
+    }
+    .char-select-stage.is-animating[data-anim="2-3"] .char-slot[data-char="3"] {
+      animation-name: char-promote-from-right;
+    }
+    /* 3 → 2 */
+    .char-select-stage.is-animating[data-anim="3-2"] .char-slot[data-char="2"] {
+      animation-name: char-promote-from-left;
+    }
+    .char-select-stage.is-animating[data-anim="3-2"] .char-slot[data-char="3"] {
+      animation-name: char-demote-to-right;
+    }
+    /* 3 → 0 */
+    .char-select-stage.is-animating[data-anim="3-0"] .char-slot[data-char="0"] {
+      animation-name: char-promote-from-right;
+    }
+    .char-select-stage.is-animating[data-anim="3-0"] .char-slot[data-char="3"] {
+      animation-name: char-demote-to-left;
+    }
+    /* 0 → 3 */
+    .char-select-stage.is-animating[data-anim="0-3"] .char-slot[data-char="0"] {
+      animation-name: char-demote-to-right;
+    }
+    .char-select-stage.is-animating[data-anim="0-3"] .char-slot[data-char="3"] {
+      animation-name: char-promote-from-left;
     }
     @keyframes char-float {
       0%, 100% { transform: translateY(0); }
@@ -932,7 +974,10 @@
         const o = opts || {};
         const c = PLAYABLE_CHARACTERS[index];
         if (!c) return;
+
+        const prevIndex = selectedCharacterIndex;
         selectedCharacterIndex = index;
+
         if (!o.skipPersist) {
           try { localStorage.setItem(CHAR_STORAGE_KEY, String(index)); } catch (_e) { /* 無視 */ }
         }
@@ -950,6 +995,23 @@
         ojisanImg.src = c.base;
         ojisanImg1.src = c.jump1;
         ojisanImg2.src = c.jump2;
+
+        // アニメーション遷移を制御
+        if (charSelectStage && !o.skipPersist && prevIndex !== index) {
+          charSwapBusy = true;
+          const numChars = PLAYABLE_CHARACTERS.length;
+          const fromIndex = prevIndex % numChars;
+          const toIndex = index % numChars;
+          charSelectStage.dataset.anim = fromIndex + '-' + toIndex;
+          charSelectStage.classList.add('is-animating');
+
+          // アニメーション完了時にクラスを削除
+          setTimeout(function () {
+            charSelectStage.classList.remove('is-animating');
+            charSwapBusy = false;
+          }, 720);
+        }
+
         syncCharSelectDom();
       }
 
