@@ -575,18 +575,15 @@
       }
       function playCharacterSelectSfx() {
         try {
-          // AudioContext を再開
+          // ユーザージェスチャー内でAudioContextを再開
           const ctxA = getAudioCtx();
           if (ctxA && ctxA.state === "suspended") {
-            ctxA.resume().catch(function () { /* 無視 */ });
+            ctxA.resume();
           }
-          // 既存の音声要素を再利用
-          charSelectSfx.currentTime = 0;
-          charSelectSfx.volume = 0.6;
-          const p = charSelectSfx.play();
-          if (p && typeof p.catch === "function") {
-            p.catch(function (err) { /* 無視 */ });
-          }
+          // 音声を再生（毎回新しいAudio要素を作成）
+          const audioToPlay = new Audio("仕掛け作動2.mp3");
+          audioToPlay.volume = 0.6;
+          audioToPlay.play().catch(function () { /* ブラウザのオーディオポリシーで拒否される場合がある */ });
         } catch (_e) { /* 無視 */ }
       }
       // iOS Safari では <audio>.volume が実質効かないことが多いので、WebAudio の Gain で制御する
