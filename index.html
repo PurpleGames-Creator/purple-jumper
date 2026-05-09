@@ -575,6 +575,15 @@
       }
       function playCharacterSelectSfx() {
         try {
+          // AudioContext を再開（ブラウザのオーディオポリシーに対応）
+          if (window.AudioContext || window.webkitAudioContext) {
+            const AudioContext = window.AudioContext || window.webkitAudioContext;
+            const ctx = new AudioContext();
+            if (ctx.state === "suspended") {
+              ctx.resume().catch(function () { /* 無視 */ });
+            }
+          }
+
           const audio = new Audio("仕掛け作動2.mp3");
           audio.volume = 0.6;
           const p = audio.play();
