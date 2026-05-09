@@ -235,7 +235,7 @@
     .char-slot[data-char="0"] { --slot-x: 0px; --slot-rot: 0deg; }
     .char-slot[data-char="1"] { --slot-x: -118px; --slot-rot: 14deg; }
     .char-slot[data-char="2"] { --slot-x: 118px; --slot-rot: -14deg; }
-    .char-slot[data-char="3"] { --slot-x: 118px; --slot-rot: -14deg; top: -140px; }
+    .char-slot[data-char="3"] { --slot-x: 118px; --slot-rot: -14deg; top: -140px; transform: scale(0.8); }
     .char-select-stage[data-selected="0"] .char-slot[data-char="0"],
     .char-select-stage[data-selected="1"] .char-slot[data-char="1"],
     .char-select-stage[data-selected="2"] .char-slot[data-char="2"] {
@@ -245,7 +245,7 @@
       opacity: 1;
     }
     .char-select-stage[data-selected="3"] .char-slot[data-char="3"] {
-      transform: translate3d(var(--slot-x), -6px, 28px) scale(1.14) rotateY(0deg);
+      transform: translate3d(var(--slot-x), -6px, 28px) scale(0.912) rotateY(0deg);
       z-index: 4;
       filter: brightness(1.05) saturate(1.08);
       opacity: 1;
