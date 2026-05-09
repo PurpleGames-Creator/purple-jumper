@@ -931,6 +931,7 @@
         if (!charSelectStage || charSwapBusy) return;
         if (toIndex < 0 || toIndex >= PLAYABLE_CHARACTERS.length) return;
         if (toIndex === selectedCharacterIndex) return;
+        playCharacterSelectSfx(); // キャラクター選択時に音を再生
         applyPlayableCharacter(toIndex);
       }
 
