@@ -235,12 +235,23 @@
     .char-slot[data-char="0"] { --slot-x: 0px; --slot-rot: 0deg; }
     .char-slot[data-char="1"] { --slot-x: -118px; --slot-rot: 14deg; }
     .char-slot[data-char="2"] { --slot-x: 118px; --slot-rot: -14deg; }
-    .char-slot[data-char="3"] { --slot-x: 0px; --slot-rot: 0deg; }
+    .char-slot[data-char="3"] {
+      --slot-x: 118px;
+      --slot-rot: -14deg;
+      transform: translate3d(var(--slot-x), calc(-6px - 120px), 28px) scale(0.9);
+      opacity: 0.8;
+      z-index: 3;
+    }
     .char-select-stage[data-selected="0"] .char-slot[data-char="0"],
     .char-select-stage[data-selected="1"] .char-slot[data-char="1"],
-    .char-select-stage[data-selected="2"] .char-slot[data-char="2"],
-    .char-select-stage[data-selected="3"] .char-slot[data-char="3"] {
+    .char-select-stage[data-selected="2"] .char-slot[data-char="2"] {
       transform: translate3d(var(--slot-x), -6px, 28px) scale(1.14) rotateY(0deg);
+      z-index: 4;
+      filter: brightness(1.05) saturate(1.08);
+      opacity: 1;
+    }
+    .char-select-stage[data-selected="3"] .char-slot[data-char="3"] {
+      transform: translate3d(var(--slot-x), calc(-6px - 120px), 28px) scale(1);
       z-index: 4;
       filter: brightness(1.05) saturate(1.08);
       opacity: 1;
@@ -253,12 +264,10 @@
     }
     .char-select-stage[data-selected="0"] .char-slot[data-char="0"] img,
     .char-select-stage[data-selected="1"] .char-slot[data-char="1"] img,
-    .char-select-stage[data-selected="2"] .char-slot[data-char="2"] img,
-    .char-select-stage[data-selected="3"] .char-slot[data-char="3"] img {
+    .char-select-stage[data-selected="2"] .char-slot[data-char="2"] img {
       animation: chara-neon 1.5s infinite alternate, char-float 2.8s ease-in-out infinite;
     }
-    .char-select-stage[data-selected="2"] .char-slot[data-char="2"],
-    .char-select-stage[data-selected="3"] .char-slot[data-char="3"] {
+    .char-select-stage[data-selected="2"] .char-slot[data-char="2"] {
       transform: translate3d(var(--slot-x), 8px, 28px) scale(0.78) rotateY(0deg);
     }
     .char-select-stage[data-selected] .char-slot {
@@ -304,29 +313,17 @@
     .char-select-stage.is-animating[data-anim="2-3"] .char-slot[data-char="2"] {
       animation-name: char-demote-to-left;
     }
-    .char-select-stage.is-animating[data-anim="2-3"] .char-slot[data-char="3"] {
-      animation-name: char-promote-from-right;
-    }
     /* 3 → 2 */
     .char-select-stage.is-animating[data-anim="3-2"] .char-slot[data-char="2"] {
       animation-name: char-promote-from-left;
-    }
-    .char-select-stage.is-animating[data-anim="3-2"] .char-slot[data-char="3"] {
-      animation-name: char-demote-to-right;
     }
     /* 3 → 0 */
     .char-select-stage.is-animating[data-anim="3-0"] .char-slot[data-char="0"] {
       animation-name: char-promote-from-right;
     }
-    .char-select-stage.is-animating[data-anim="3-0"] .char-slot[data-char="3"] {
-      animation-name: char-demote-to-left;
-    }
     /* 0 → 3 */
     .char-select-stage.is-animating[data-anim="0-3"] .char-slot[data-char="0"] {
       animation-name: char-demote-to-right;
-    }
-    .char-select-stage.is-animating[data-anim="0-3"] .char-slot[data-char="3"] {
-      animation-name: char-promote-from-left;
     }
     @keyframes char-float {
       0%, 100% { transform: translateY(0); }
