@@ -575,10 +575,12 @@
       }
       function playCharacterSelectSfx() {
         try {
-          const audioClone = charSelectSfx.cloneNode();
-          audioClone.currentTime = 0;
-          const p = audioClone.play();
-          if (p && typeof p.catch === "function") p.catch(function () { /* 無視 */ });
+          const audio = new Audio("仕掛け作動2.mp3");
+          audio.volume = 0.6;
+          const p = audio.play();
+          if (p && typeof p.catch === "function") {
+            p.catch(function (err) { console.log("音声再生エラー:", err); });
+          }
         } catch (_e) { /* 無視 */ }
       }
       // iOS Safari では <audio>.volume が実質効かないことが多いので、WebAudio の Gain で制御する
