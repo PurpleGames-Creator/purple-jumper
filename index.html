@@ -573,9 +573,14 @@
           }
         } catch (_e) { /* 無視 */ }
       }
-      function playCharacterSelectSfx() {
+      function playCharacterSelectSfx(charIndex) {
         try {
-          const audio = new Audio("仕掛け作動2.mp3");
+          // 餃子（index 3）の場合は「juu.mp3」、それ以外は「仕掛け作動2.mp3」
+          var fileName = "仕掛け作動2.mp3";
+          if (charIndex === 3) {
+            fileName = "juu.mp3";
+          }
+          const audio = new Audio(fileName);
           audio.volume = 0.6;
           audio.play().catch(function () { /* ブラウザのオーディオポリシーで拒否される場合がある */ });
         } catch (e) { /* 無視 */ }
@@ -921,7 +926,7 @@
         if (!charSelectStage || charSwapBusy) return;
         if (toIndex < 0 || toIndex >= PLAYABLE_CHARACTERS.length) return;
         if (toIndex === selectedCharacterIndex) return;
-        playCharacterSelectSfx(); // キャラクター選択時に音を再生
+        playCharacterSelectSfx(toIndex); // キャラクターインデックスをパラメータとして渡す
         applyPlayableCharacter(toIndex);
       }
 
