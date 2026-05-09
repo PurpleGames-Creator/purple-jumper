@@ -575,8 +575,9 @@
       }
       function playCharacterSelectSfx() {
         try {
-          charSelectSfx.currentTime = 0;
-          const p = charSelectSfx.play();
+          const audioClone = charSelectSfx.cloneNode();
+          audioClone.currentTime = 0;
+          const p = audioClone.play();
           if (p && typeof p.catch === "function") p.catch(function () { /* 無視 */ });
         } catch (_e) { /* 無視 */ }
       }
