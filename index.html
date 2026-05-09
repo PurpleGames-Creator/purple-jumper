@@ -575,18 +575,15 @@
       }
       function playCharacterSelectSfx() {
         try {
-          // AudioContext を再開（ブラウザのオーディオポリシーに対応）
-          if (window.AudioContext || window.webkitAudioContext) {
-            const AudioContext = window.AudioContext || window.webkitAudioContext;
-            const ctx = new AudioContext();
-            if (ctx.state === "suspended") {
-              ctx.resume().catch(function () { /* 無視 */ });
-            }
+          // AudioContext を再開
+          const ctxA = getAudioCtx();
+          if (ctxA && ctxA.state === "suspended") {
+            ctxA.resume().catch(function () { /* 無視 */ });
           }
-
-          const audio = new Audio("仕掛け作動2.mp3");
-          audio.volume = 0.6;
-          const p = audio.play();
+          // 既存の音声要素を再利用
+          charSelectSfx.currentTime = 0;
+          charSelectSfx.volume = 0.6;
+          const p = charSelectSfx.play();
           if (p && typeof p.catch === "function") {
             p.catch(function (err) { console.log("音声再生エラー:", err); });
           }
