@@ -581,13 +581,21 @@
             ctxA.resume().catch(function () { /* 無視 */ });
           }
           // 既存の音声要素を再利用
+          console.log("再生前 - readyState:", charSelectSfx.readyState, "networkState:", charSelectSfx.networkState);
           charSelectSfx.currentTime = 0;
           charSelectSfx.volume = 0.6;
           const p = charSelectSfx.play();
+          console.log("play() 呼び出し完了");
           if (p && typeof p.catch === "function") {
-            p.catch(function (err) { console.log("音声再生エラー:", err); });
+            p.then(function () {
+              console.log("✅ 音声再生成功");
+            }).catch(function (err) {
+              console.log("❌ 音声再生エラー:", err.name, err.message);
+            });
           }
-        } catch (_e) { /* 無視 */ }
+        } catch (_e) {
+          console.log("例外エラー:", _e);
+        }
       }
       // iOS Safari では <audio>.volume が実質効かないことが多いので、WebAudio の Gain で制御する
       const BGM_BASE_GAIN = 0.12;
