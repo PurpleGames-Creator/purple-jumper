@@ -262,6 +262,18 @@
     .char-select-stage[data-selected="3"] .char-slot[data-char="3"] img {
       animation: chara-neon 1.5s infinite alternate, char-float 2.8s ease-in-out infinite;
     }
+    .char-select-stage[data-selected="0"] .char-slot[data-char="0"] .char-slot-name {
+      transform: scale(0.877);
+    }
+    .char-select-stage[data-selected="1"] .char-slot[data-char="1"] .char-slot-name {
+      transform: scale(1);
+    }
+    .char-select-stage[data-selected="2"] .char-slot[data-char="2"] .char-slot-name {
+      transform: scale(1.462);
+    }
+    .char-select-stage[data-selected="3"] .char-slot[data-char="3"] .char-slot-name {
+      transform: scale(1.250);
+    }
     .char-select-stage[data-selected="2"] .char-slot[data-char="2"] {
       transform: translate3d(var(--slot-x), 8px, 28px) scale(0.78) rotateY(0deg);
     }
@@ -1414,8 +1426,9 @@
           var curCh = PLAYABLE_CHARACTERS[selectedCharacterIndex];
           var isIsshou = curCh && curCh.id === "gen";
           var isPaputaro = curCh && curCh.id === "paputaro";
-          if (isPaputaro) {
-            // パプ太郎はプレイ中、常に最小表示サイズで固定
+          var isGyoza = curCh && curCh.id === "gyoza";
+          if (isPaputaro || isGyoza) {
+            // パプ太郎と餃子はプレイ中、常に最小表示サイズで固定
             sizeScale = 0.7;
           } else if (!isIsshou) {
             if (player.vy > 1.5 && player.vy < 6) {
