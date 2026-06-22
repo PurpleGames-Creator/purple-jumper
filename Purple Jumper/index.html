@@ -924,8 +924,6 @@
         applyPlayableCharacter(toIndex);
       }
 
-      let charCenterPassedIndices = new Set(); // アニメーション中に中央を通過したキャラを追跡
-
       if (charSelectStage) {
         var charSelectSkipClickUntil = 0;
         function handleCharSelectPick(e) {
@@ -934,6 +932,8 @@
           var idx = parseInt(btn.getAttribute("data-char"), 10);
           if (isNaN(idx) || idx < 0 || idx >= PLAYABLE_CHARACTERS.length) return;
           if (idx === selectedCharacterIndex) return;
+          // タップした瞬間に効果音を鳴らす（アニメーション完了を待たない）
+          playCharacterSelectSfx();
           runCharacterSwap(idx);
         }
         charSelectStage.addEventListener("pointerdown", function (e) {
@@ -944,29 +944,6 @@
         charSelectStage.addEventListener("click", function (e) {
           if (Date.now() < charSelectSkipClickUntil) return;
           handleCharSelectPick(e);
-        });
-
-        // アニメーション中の中央通過を監視
-        charSelectStage.addEventListener("animationstart", function (e) {
-          if (e.target.classList && e.target.classList.contains("char-slot")) {
-            charCenterPassedIndices.clear();
-          }
-        });
-
-        charSelectStage.addEventListener("animationiteration", function (e) {
-          if (e.target.classList && e.target.classList.contains("char-slot")) {
-            var charIdx = parseInt(e.target.getAttribute("data-char"), 10);
-            if (!isNaN(charIdx) && !charCenterPassedIndices.has(charIdx)) {
-              charCenterPassedIndices.add(charIdx);
-              playCharacterSelectSfx();
-            }
-          }
-        });
-
-        charSelectStage.addEventListener("animationend", function (e) {
-          if (e.target.classList && e.target.classList.contains("char-slot")) {
-            charCenterPassedIndices.clear();
-          }
         });
       }
 
