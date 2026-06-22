@@ -544,8 +544,46 @@
       const charSelectSfx = new Audio("仕掛け作動2.mp3");
       charSelectSfx.preload = "auto";
       charSelectSfx.playsInline = true;
+
+      // 効果音はWebAudioのデコード済みバッファで鳴らす。
+      // 毎回 new Audio() するとロード/デコードで遅延するため、事前にデコードしておき、
+      // タップごとにBufferSourceを生成して即時・重ね再生する。
+      const CHAR_SFX_FILES = ["仕掛け作動2.mp3", "juu.mp3"]; // 通常 / 餃子(index3)用
+      const charSfxBuffers = {};  // fileName -> AudioBuffer
+      const charSfxLoading = {};  // fileName -> bool
+      function sfxFileForChar(charIndex) {
+        return charIndex === 3 ? "juu.mp3" : "仕掛け作動2.mp3";
+      }
+      function loadCharSfxBuffer(fileName) {
+        if (!fileName || charSfxBuffers[fileName] || charSfxLoading[fileName]) return;
+        const ctxA = getAudioCtx();
+        if (!ctxA) return;
+        charSfxLoading[fileName] = true;
+        fetch(fileName)
+          .then(function (res) { return res.arrayBuffer(); })
+          .then(function (buf) {
+            return new Promise(function (resolve, reject) {
+              // Safari互換: コールバック形式と Promise 形式の両対応
+              const ret = ctxA.decodeAudioData(buf, resolve, reject);
+              if (ret && typeof ret.then === "function") ret.then(resolve, reject);
+            });
+          })
+          .then(function (decoded) { charSfxBuffers[fileName] = decoded; })
+          .catch(function () { charSfxLoading[fileName] = false; });
+      }
+      function preloadAllCharSfx() {
+        for (var i = 0; i < CHAR_SFX_FILES.length; i++) loadCharSfxBuffer(CHAR_SFX_FILES[i]);
+      }
+
       let charSelectSfxWarmed = false;
       function warmupCharacterSelectSfx() {
+        // WebAudioを解錠し、効果音バッファのデコードを先に済ませておく
+        const ctxA = getAudioCtx();
+        if (ctxA && ctxA.state === "suspended" && ctxA.resume) {
+          const r = ctxA.resume();
+          if (r && typeof r.catch === "function") r.catch(function () { /* 無視 */ });
+        }
+        preloadAllCharSfx();
         if (charSelectSfxWarmed) return;
         charSelectSfxWarmed = true;
         try {
@@ -574,12 +612,28 @@
         } catch (_e) { /* 無視 */ }
       }
       function playCharacterSelectSfx(charIndex) {
+        const fileName = sfxFileForChar(charIndex);
+        const ctxA = getAudioCtx();
+        const buffer = charSfxBuffers[fileName];
+        // 優先: WebAudioのデコード済みバッファ（遅延ほぼゼロ・重ね再生OK）
+        if (ctxA && buffer) {
+          try {
+            if (ctxA.state === "suspended" && ctxA.resume) {
+              const r = ctxA.resume();
+              if (r && typeof r.catch === "function") r.catch(function () { /* 無視 */ });
+            }
+            const src = ctxA.createBufferSource();
+            src.buffer = buffer;
+            const gain = ctxA.createGain();
+            gain.gain.setValueAtTime(0.6, ctxA.currentTime);
+            src.connect(gain).connect(ctxA.destination);
+            src.start(0);
+            return;
+          } catch (_e) { /* フォールバックへ */ }
+        }
+        // 未デコード時フォールバック: 都度Audio（同時に今後用のデコードも開始）
+        loadCharSfxBuffer(fileName);
         try {
-          // 餃子（index 3）の場合は「juu.mp3」、それ以外は「仕掛け作動2.mp3」
-          var fileName = "仕掛け作動2.mp3";
-          if (charIndex === 3) {
-            fileName = "juu.mp3";
-          }
           const audio = new Audio(fileName);
           audio.volume = 0.6;
           audio.play().catch(function () { /* ブラウザのオーディオポリシーで拒否される場合がある */ });
@@ -853,7 +907,7 @@
       const charSlot1 = document.getElementById("char-slot-1");
       const charSlot2 = document.getElementById("char-slot-2");
       const charSlot3 = document.getElementById("char-slot-3");
-      let charSwapBusy = false;
+      let charSwapAnimTimer = 0;
 
       function isSlotSwapAnimation(name) {
         return name === "char-promote-from-right" || name === "char-demote-to-left" ||
@@ -895,9 +949,8 @@
         ojisanImg1.src = c.jump1;
         ojisanImg2.src = c.jump2;
 
-        // アニメーション遷移を制御
+        // アニメーション遷移を制御（連打されても最後のタップ基準でクラスを外す）
         if (charSelectStage && !o.skipPersist && prevIndex !== index) {
-          charSwapBusy = true;
           const numChars = PLAYABLE_CHARACTERS.length;
           const fromIndex = prevIndex % numChars;
           const toIndex = index % numChars;
@@ -905,9 +958,10 @@
           charSelectStage.classList.add('is-animating');
 
           // アニメーション完了時にクラスを削除
-          setTimeout(function () {
+          if (charSwapAnimTimer) clearTimeout(charSwapAnimTimer);
+          charSwapAnimTimer = setTimeout(function () {
             charSelectStage.classList.remove('is-animating');
-            charSwapBusy = false;
+            charSwapAnimTimer = 0;
           }, 720);
         }
 
@@ -923,22 +977,21 @@
       }
 
       function runCharacterSwap(toIndex) {
-        if (!charSelectStage || charSwapBusy) return;
+        if (!charSelectStage) return;
         if (toIndex < 0 || toIndex >= PLAYABLE_CHARACTERS.length) return;
         if (toIndex === selectedCharacterIndex) return;
-        playCharacterSelectSfx(toIndex); // キャラクターインデックスをパラメータとして渡す
         applyPlayableCharacter(toIndex);
       }
-
-      let charCenterPassedIndices = new Set(); // アニメーション中に中央を通過したキャラを追跡
 
       if (charSelectStage) {
         var charSelectSkipClickUntil = 0;
         function handleCharSelectPick(e) {
           var btn = e.target.closest(".char-slot");
-          if (!btn || charSwapBusy) return;
+          if (!btn) return;
           var idx = parseInt(btn.getAttribute("data-char"), 10);
           if (isNaN(idx) || idx < 0 || idx >= PLAYABLE_CHARACTERS.length) return;
+          // どんな状況でも（アニメーション中でも）タップした瞬間に効果音を鳴らす
+          playCharacterSelectSfx(idx);
           if (idx === selectedCharacterIndex) return;
           runCharacterSwap(idx);
         }
@@ -950,29 +1003,6 @@
         charSelectStage.addEventListener("click", function (e) {
           if (Date.now() < charSelectSkipClickUntil) return;
           handleCharSelectPick(e);
-        });
-
-        // アニメーション中の中央通過を監視
-        charSelectStage.addEventListener("animationstart", function (e) {
-          if (e.target.classList && e.target.classList.contains("char-slot")) {
-            charCenterPassedIndices.clear();
-          }
-        });
-
-        charSelectStage.addEventListener("animationiteration", function (e) {
-          if (e.target.classList && e.target.classList.contains("char-slot")) {
-            var charIdx = parseInt(e.target.getAttribute("data-char"), 10);
-            if (!isNaN(charIdx) && !charCenterPassedIndices.has(charIdx)) {
-              charCenterPassedIndices.add(charIdx);
-              playCharacterSelectSfx();
-            }
-          }
-        });
-
-        charSelectStage.addEventListener("animationend", function (e) {
-          if (e.target.classList && e.target.classList.contains("char-slot")) {
-            charCenterPassedIndices.clear();
-          }
         });
       }
 
