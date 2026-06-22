@@ -542,74 +542,56 @@
       bgmAudio.preload = "auto";
       bgmAudio.playsInline = true;
 
-      // 効果音はWebAudioのデコード済みバッファで鳴らす。
-      // 毎回 new Audio() するとロード/デコードで遅延するため、事前にデコードしておき、
-      // タップごとにBufferSourceを生成して即時・重ね再生する。
+      // 効果音は事前ロードしたHTML5 Audioのプールで鳴らす。
+      // （WebAudioのデコード済みバッファ再生だと2回目以降に破裂音=ポップが乗る不具合が
+      //   あったため、1回目で正常に鳴っていたHTML5 Audio方式に統一。プール化で低遅延＆重ね再生）
       const CHAR_SFX_FILES = ["仕掛け作動2.mp3", "juu.mp3"]; // 通常 / 餃子(index3)用
-      const charSfxBuffers = {};  // fileName -> AudioBuffer
-      const charSfxLoading = {};  // fileName -> bool
+      const SFX_VOLUME = 0.6;
+      const SFX_POOL_SIZE = 4;
+      const charSfxPools = {};    // fileName -> [Audio, ...]
+      const charSfxPoolNext = {}; // fileName -> 次に使うindex
       function sfxFileForChar(charIndex) {
         return charIndex === 3 ? "juu.mp3" : "仕掛け作動2.mp3";
       }
-      function loadCharSfxBuffer(fileName) {
-        if (!fileName || charSfxBuffers[fileName] || charSfxLoading[fileName]) return;
-        const ctxA = getAudioCtx();
-        if (!ctxA) return;
-        charSfxLoading[fileName] = true;
-        fetch(fileName)
-          .then(function (res) { return res.arrayBuffer(); })
-          .then(function (buf) {
-            return new Promise(function (resolve, reject) {
-              // Safari互換: コールバック形式と Promise 形式の両対応
-              const ret = ctxA.decodeAudioData(buf, resolve, reject);
-              if (ret && typeof ret.then === "function") ret.then(resolve, reject);
-            });
-          })
-          .then(function (decoded) { charSfxBuffers[fileName] = decoded; })
-          .catch(function () { charSfxLoading[fileName] = false; });
+      function ensureCharSfxPool(fileName) {
+        if (charSfxPools[fileName]) return charSfxPools[fileName];
+        const arr = [];
+        for (let i = 0; i < SFX_POOL_SIZE; i++) {
+          const a = new Audio(fileName);
+          a.preload = "auto";
+          a.playsInline = true;
+          a.volume = SFX_VOLUME;
+          try { a.load(); } catch (_e) { /* 無視 */ }
+          arr.push(a);
+        }
+        charSfxPools[fileName] = arr;
+        charSfxPoolNext[fileName] = 0;
+        return arr;
       }
       function preloadAllCharSfx() {
-        for (var i = 0; i < CHAR_SFX_FILES.length; i++) loadCharSfxBuffer(CHAR_SFX_FILES[i]);
+        for (let i = 0; i < CHAR_SFX_FILES.length; i++) ensureCharSfxPool(CHAR_SFX_FILES[i]);
       }
+      // ページ表示直後からプールのロードを開始しておく（初回タップを早く鳴らすため）
+      preloadAllCharSfx();
 
       function warmupCharacterSelectSfx() {
-        // WebAudioを解錠し、効果音バッファのデコードを先に済ませておくだけ。
-        // （以前ここでHTML5 Audioをミュート再生していたが、ミュート反映の遅れで
-        //   トップ画面に一瞬"バン"と音が漏れることがあったため廃止。実再生はWebAudioで行う）
-        const ctxA = getAudioCtx();
-        if (ctxA && ctxA.state === "suspended" && ctxA.resume) {
-          const r = ctxA.resume();
-          if (r && typeof r.catch === "function") r.catch(function () { /* 無視 */ });
-        }
+        // 効果音プールを確実に用意するだけ（音は出さない）。実再生は各タップのジェスチャ内で行う。
         preloadAllCharSfx();
       }
       function playCharacterSelectSfx(charIndex) {
         const fileName = sfxFileForChar(charIndex);
-        const ctxA = getAudioCtx();
-        const buffer = charSfxBuffers[fileName];
-        // 優先: WebAudioのデコード済みバッファ（遅延ほぼゼロ・重ね再生OK）
-        if (ctxA && buffer) {
-          try {
-            if (ctxA.state === "suspended" && ctxA.resume) {
-              const r = ctxA.resume();
-              if (r && typeof r.catch === "function") r.catch(function () { /* 無視 */ });
-            }
-            const src = ctxA.createBufferSource();
-            src.buffer = buffer;
-            const gain = ctxA.createGain();
-            gain.gain.setValueAtTime(0.6, ctxA.currentTime);
-            src.connect(gain).connect(ctxA.destination);
-            src.start(0);
-            return;
-          } catch (_e) { /* フォールバックへ */ }
-        }
-        // 未デコード時フォールバック: 都度Audio（同時に今後用のデコードも開始）
-        loadCharSfxBuffer(fileName);
+        const pool = ensureCharSfxPool(fileName);
+        if (!pool || !pool.length) return;
+        const i = charSfxPoolNext[fileName] % pool.length;
+        charSfxPoolNext[fileName] = (i + 1) % pool.length;
+        const audio = pool[i];
         try {
-          const audio = new Audio(fileName);
-          audio.volume = 0.6;
-          audio.play().catch(function () { /* ブラウザのオーディオポリシーで拒否される場合がある */ });
-        } catch (e) { /* 無視 */ }
+          audio.muted = false;
+          audio.volume = SFX_VOLUME;
+          audio.currentTime = 0;
+          const p = audio.play();
+          if (p && typeof p.catch === "function") p.catch(function () { /* 無視 */ });
+        } catch (_e) { /* 無視 */ }
       }
       // iOS Safari では <audio>.volume が実質効かないことが多いので、WebAudio の Gain で制御する
       const BGM_BASE_GAIN = 0.12;
