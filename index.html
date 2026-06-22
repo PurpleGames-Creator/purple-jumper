@@ -541,9 +541,6 @@
       bgmAudio.loop = true;
       bgmAudio.preload = "auto";
       bgmAudio.playsInline = true;
-      const charSelectSfx = new Audio("仕掛け作動2.mp3");
-      charSelectSfx.preload = "auto";
-      charSelectSfx.playsInline = true;
 
       // 効果音はWebAudioのデコード済みバッファで鳴らす。
       // 毎回 new Audio() するとロード/デコードで遅延するため、事前にデコードしておき、
@@ -575,41 +572,16 @@
         for (var i = 0; i < CHAR_SFX_FILES.length; i++) loadCharSfxBuffer(CHAR_SFX_FILES[i]);
       }
 
-      let charSelectSfxWarmed = false;
       function warmupCharacterSelectSfx() {
-        // WebAudioを解錠し、効果音バッファのデコードを先に済ませておく
+        // WebAudioを解錠し、効果音バッファのデコードを先に済ませておくだけ。
+        // （以前ここでHTML5 Audioをミュート再生していたが、ミュート反映の遅れで
+        //   トップ画面に一瞬"バン"と音が漏れることがあったため廃止。実再生はWebAudioで行う）
         const ctxA = getAudioCtx();
         if (ctxA && ctxA.state === "suspended" && ctxA.resume) {
           const r = ctxA.resume();
           if (r && typeof r.catch === "function") r.catch(function () { /* 無視 */ });
         }
         preloadAllCharSfx();
-        if (charSelectSfxWarmed) return;
-        charSelectSfxWarmed = true;
-        try {
-          const prevMuted = charSelectSfx.muted;
-          const prevVolume = charSelectSfx.volume;
-          charSelectSfx.muted = true;
-          charSelectSfx.volume = 0;
-          charSelectSfx.currentTime = 0;
-          const p = charSelectSfx.play();
-          if (p && typeof p.then === "function") {
-            p.then(function () {
-              charSelectSfx.pause();
-              charSelectSfx.currentTime = 0;
-              charSelectSfx.muted = prevMuted;
-              charSelectSfx.volume = prevVolume;
-            }).catch(function () {
-              charSelectSfx.muted = prevMuted;
-              charSelectSfx.volume = prevVolume;
-            });
-          } else {
-            charSelectSfx.pause();
-            charSelectSfx.currentTime = 0;
-            charSelectSfx.muted = prevMuted;
-            charSelectSfx.volume = prevVolume;
-          }
-        } catch (_e) { /* 無視 */ }
       }
       function playCharacterSelectSfx(charIndex) {
         const fileName = sfxFileForChar(charIndex);
