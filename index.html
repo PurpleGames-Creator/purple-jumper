@@ -1804,7 +1804,10 @@
         if (btnStart.disabled) return;
         playStartTransition(e, function () {
           playerName = nicknameInput.value.trim() || "ななしさん";
-          localStorage.setItem("murasaki_ojisan_player_name", playerName);
+          try {
+            localStorage.setItem("purple_games_nickname", playerName);
+            localStorage.setItem("murasaki_ojisan_player_name", playerName);
+          } catch (_e) { /* 無視 */ }
           previousBest = bestStep;
           gameStarted = true; paused = false;
           startBgm();
@@ -1827,8 +1830,17 @@
       }
       updateStartButtonState();
 
-      const savedName = localStorage.getItem("murasaki_ojisan_player_name");
-      if (savedName) { playerName = savedName; if (nicknameInput) nicknameInput.value = savedName; updateStartButtonState(); }
+      // 全ゲーム共通キーを優先し、無ければ旧キー(murasaki_ojisan_player_name)から引き継ぐ
+      let savedName = "";
+      try {
+        savedName = localStorage.getItem("purple_games_nickname") || localStorage.getItem("murasaki_ojisan_player_name") || "";
+      } catch (_e) { savedName = ""; }
+      if (savedName) {
+        if (nicknameInput && nicknameInput.maxLength > 0) savedName = savedName.slice(0, nicknameInput.maxLength);
+        playerName = savedName;
+        if (nicknameInput) nicknameInput.value = savedName;
+        updateStartButtonState();
+      }
       window.addEventListener("pointerdown", warmupCharacterSelectSfx, { once: true, passive: true });
       window.addEventListener("touchstart", warmupCharacterSelectSfx, { once: true, passive: true });
       window.addEventListener("keydown", warmupCharacterSelectSfx, { once: true });
