@@ -138,22 +138,28 @@
       align-items: center;
       justify-content: center;
       gap: 8px;
-      transform: translateX(-32px);
+      /* 文字を中央に見せるため、ロゴ(36px)+ gap(8px)の半分だけ左へ寄せる */
+      transform: translateX(-22px);
     }
+    /* HP へのパプ太郎(2026-09-22 Purple Park の文字ロゴから差し替え。全ゲームで統一) */
     .kamiki-ver-logo {
       display: block;
+      width: 36px;
       height: 36px;
-      width: auto;
-      max-width: 132px;
-      object-fit: contain;
-      image-rendering: auto;
-      filter: drop-shadow(0 0 4px rgba(139, 92, 246, 0.35));
+      filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.55));
     }
     .kamiki-ver-logo-link {
+      position: relative;
       display: inline-flex;
       align-items: center;
       line-height: 0;
       text-decoration: none;
+    }
+    /* 見た目は 36px のまま、押せる範囲だけ 44px に広げる */
+    .kamiki-ver-logo-link::before {
+      content: "";
+      position: absolute;
+      inset: -4px;
     }
     @keyframes chara-neon {
       from { 
@@ -440,8 +446,8 @@
         <div class="start-title">🟣Purple Jumper🟣</div>
         <div class="kamiki-ver">
           <span class="kamiki-ver-inner">
-            <a class="kamiki-ver-logo-link" href="https://purple-park.vercel.app/" target="_blank" rel="noopener noreferrer" aria-label="Purple Park サイトへ">
-              <img src="logo.png" alt="" class="kamiki-ver-logo" draggable="false" />
+            <a class="kamiki-ver-logo-link" href="https://purple-park.vercel.app/" target="_blank" rel="noopener noreferrer" aria-label="Purple Games のホームページへ">
+              <img src="purplegames_icon.webp" width="128" height="128" alt="" class="kamiki-ver-logo" draggable="false" />
             </a>
             <span>キャラクターを選ぶ</span>
           </span>
